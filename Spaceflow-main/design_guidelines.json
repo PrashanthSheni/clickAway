@@ -1,0 +1,148 @@
+{
+  "theme": "light",
+  "archetype": "4 (Swiss & High-Contrast)",
+  "context": "Enterprise SaaS Dashboard / Admin Panel",
+  "emotional_tone": "Trustworthy, Efficient, Uncluttered, Operational",
+  "colors": {
+    "primary": {
+      "hex": "#2563EB",
+      "tw_class": "blue-600",
+      "usage": "Primary actions, current active tabs, primary KPI numbers. Limit usage to avoid overwhelming the screen. It should act as a 'signal' color."
+    },
+    "secondary": {
+      "hex": "#0F172A",
+      "tw_class": "slate-900",
+      "usage": "Headings, high-contrast structural elements, sidebar background (optional, though white is preferred), heavy typography."
+    },
+    "background": {
+      "hex": "#F8FAFC",
+      "tw_class": "slate-50",
+      "usage": "Global application background. Adds a subtle coolness that feels clean and modern."
+    },
+    "surface": {
+      "hex": "#FFFFFF",
+      "tw_class": "white",
+      "usage": "Cards, modals, dropdowns, sidebar, and top navbar. Must contrast sharply with the slate-50 background using borders."
+    },
+    "border": {
+      "hex": "#E2E8F0",
+      "tw_class": "slate-200",
+      "usage": "Sharp 1px solid borders for all widgets, grid items, and separators. No soft shadows; rely on borders for definition."
+    },
+    "text": {
+      "heading": "#0F172A",
+      "body": "#334155",
+      "muted": "#64748B",
+      "inverse": "#FFFFFF"
+    },
+    "semantic": {
+      "success": "#16A34A",
+      "success_bg": "#DCFCE7",
+      "warning": "#D97706",
+      "warning_bg": "#FEF3C7",
+      "error": "#DC2626",
+      "error_bg": "#FEE2E2",
+      "info": "#2563EB",
+      "info_bg": "#DBEAFE"
+    }
+  },
+  "typography": {
+    "fonts": {
+      "primary": "Inter"
+    },
+    "rules": {
+      "h1": "text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900",
+      "h2": "text-2xl sm:text-3xl font-bold tracking-tight text-slate-900",
+      "h3": "text-xl font-semibold text-slate-900",
+      "h4": "text-sm font-bold uppercase tracking-widest text-slate-500",
+      "body": "text-sm md:text-base font-medium text-slate-700",
+      "data_numbers": "text-4xl md:text-5xl font-black tracking-tighter text-slate-900",
+      "badges": "text-xs font-bold uppercase tracking-wider"
+    },
+    "tension_strategy": "Since Inter is mandatory, create tension through extreme weight contrast: use font-black (900) for large KPI numbers and section headers, and font-medium (500) for body text. Use wide tracking (tracking-widest) for overlines and tight tracking (tracking-tighter) for big metrics."
+  },
+  "layout": {
+    "structure": "Sidebar + Top Navbar (Fixed).",
+    "sidebar": "w-64 fixed h-screen bg-white border-r border-slate-200.",
+    "top_navbar": "h-16 fixed top-0 left-64 right-0 bg-white/80 backdrop-blur-xl border-b border-slate-200 z-40.",
+    "main_content": "pt-16 pl-64 min-h-screen bg-slate-50",
+    "spacing_scale": "p-6 md:p-8",
+    "grid_system": {
+      "mode": "MODE B: THE CONTROL ROOM GRID",
+      "gap": "gap-4 md:gap-6",
+      "columns": "grid-cols-1 md:grid-cols-3 lg:grid-cols-4",
+      "behavior": "Dense, highly structured. Every pixel is utilized. No jagged bottoms. Use flex-col and h-full on cards to ensure they stretch evenly."
+    }
+  },
+  "surface_styles": {
+    "cards": "bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden",
+    "hover_state": "hover:border-blue-300 hover:shadow-md transition-all duration-200",
+    "glassmorphism": "Used ONLY for the sticky top navbar (bg-white/80 backdrop-blur-xl border-b border-slate-200) or modal scrims (bg-slate-900/40 backdrop-blur-sm)."
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-blue-600 text-white font-semibold rounded-md px-4 py-2 hover:bg-blue-700 focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 transition-colors",
+      "secondary": "bg-white text-slate-900 border border-slate-300 font-semibold rounded-md px-4 py-2 hover:bg-slate-50 focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 transition-colors",
+      "ghost": "bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900 rounded-md px-4 py-2 transition-colors"
+    },
+    "inputs": "bg-white border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+    "badges": "px-2 py-1 rounded-full text-xs font-bold uppercase tracking-wider",
+    "tables": "w-full text-left text-sm text-slate-600. Headers must be uppercase, tracking-wider, text-xs text-slate-500. Rows separated by border-b border-slate-100."
+  },
+  "media": {
+    "image_urls": [
+      {
+        "category": "auth_background",
+        "url": "https://images.unsplash.com/photo-1641803936642-e4ce33a633bc?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzOTB8MHwxfHNlYXJjaHwyfHxhYnN0cmFjdCUyMGdlb21ldHJpYyUyMGJsdWUlMjBzbGF0ZSUyMHBhdHRlcm58ZW58MHx8fHwxNzc2ODM1NzM4fDA&ixlib=rb-4.1.0&q=85",
+        "description": "Abstract geometric blue slate pattern for the login screen background."
+      },
+      {
+        "category": "resource_room_1",
+        "url": "https://images.unsplash.com/photo-1628017974725-18928e8e8211?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2OTV8MHwxfHNlYXJjaHwzfHxtb2Rlcm4lMjBvZmZpY2UlMjBtZWV0aW5nJTIwcm9vbXxlbnwwfHx8fDE3NzY4MzU3Mjd8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Modern office meeting room for Browse Resources grid."
+      },
+      {
+        "category": "resource_room_2",
+        "url": "https://images.pexels.com/photos/5511124/pexels-photo-5511124.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "Spacious conference room for Browse Resources grid."
+      },
+      {
+        "category": "floor_map_visual",
+        "url": "https://images.unsplash.com/photo-1721244654195-943615c56ac4?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTF8MHwxfHNlYXJjaHwxfHxhcmNoaXRlY3R1cmFsJTIwZmxvb3IlMjBwbGFuJTIwYmx1ZXByaW50fGVufDB8fHx8MTc3NjgzNTczOHww&ixlib=rb-4.1.0&q=85",
+        "description": "Architectural floor plan blueprint for Floor Map view."
+      },
+      {
+        "category": "manager_avatar",
+        "url": "https://images.unsplash.com/photo-1560250097-0b93528c311a?crop=faces&fit=crop&w=256&h=256",
+        "description": "Professional manager avatar"
+      },
+      {
+        "category": "employee_avatar",
+        "url": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?crop=faces&fit=crop&w=256&h=256",
+        "description": "Professional employee avatar"
+      }
+    ],
+    "usage_rules": "Never use generic placeholders. Use the provided images for respective sections. Add subtle bg-black/10 overlays if text needs to be placed over them."
+  },
+  "motion": {
+    "hover": "Subtle border color shifts (border-slate-200 to border-blue-400) and small lifts (-translate-y-[2px]) on interactive cards.",
+    "page_transition": "Simple opacity fades. Avoid heavy motion in enterprise tools to maintain speed.",
+    "data_loading": "Use skeleton loaders with pulse animation (animate-pulse bg-slate-200) mimicking the exact shape of the missing data, rather than spinning wheels."
+  },
+  "accessibility": {
+    "contrast": "Ensure all text, especially gray muted text (text-slate-500), maintains at least 4.5:1 ratio against its background.",
+    "focus": "All interactive elements must have focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none.",
+    "testing": "All interactive elements (buttons, inputs, menu items, tabs) MUST include a data-testid attribute in kebab-case."
+  },
+  "instructions_to_main_agent": [
+    "Strictly follow the user's requested colors: Primary (#2563EB), Secondary (#0F172A), Background (#F8FAFC).",
+    "Strictly use the Inter font, but apply E1 tension rules: use font-black for major KPIs and font-medium for standard text to avoid generic flatness.",
+    "Layout is fixed: Sidebar on the left, Top Navbar spanning the remaining width. Main content padded properly to avoid being hidden behind fixed elements.",
+    "Use Lucide React (lucide-react) for all icons.",
+    "For Analytics Dashboard, use Recharts with stroke colors matching the app's palette (blue-600, slate-900, slate-300).",
+    "For Calendar View, utilize react-big-calendar styled with Tailwind to match the app's clean, border-heavy aesthetic.",
+    "For the Floor Map, use the provided architectural blueprint image combined with absolute-positioned HTML overlay markers (pins or selectable zones).",
+    "Do NOT use generic card components everywhere if it creates a 'boxed' feeling. Rely on raw HTML/Tailwind borders and grid structures for data density.",
+    "Implement 'data-testid' on all interactive elements without fail."
+  ]
+}

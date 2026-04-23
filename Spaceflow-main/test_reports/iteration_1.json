@@ -1,0 +1,39 @@
+{
+  "summary": "Backend: 36/38 pytest passed (1 skipped - check-in time window conditional, 1 real bug: PUT /api/resources/{id} returns 500). All core flows verified: auth (admin/manager/employee), resource list w/ policies, booking validate/create/approve/reject/cancel/checkin/extend, QR code gating, role enforcement (403), parking capacity, maintenance preview+apply cascading cancellations, reports overview (admin+manager, 403 for employee), calendar endpoints. Frontend: login page, demo accounts visible, employee & admin logins both redirect correctly. Role-gated sidebar works (admin sees Manager/Admin sections; employee doesn't). Dashboard/Browse Resources/Operations dashboard render correctly with data.",
+  "backend_issues": {
+    "critical": [
+      {"endpoint": "PUT /api/resources/{id}", "issue": "Returns 500. RCA: routers/resources_routes.py update_resource does setattr(r, 'type', v) where v is a raw str from body, overwriting the enum column. Subsequent _to_out() does r.type.value -> AttributeError 'str' object has no attribute 'value'. Fix: cast to ResourceType enum (e.g., setattr(r,'type',ResourceType(v))) or use Pydantic validator.", "priority": "HIGH"}
+    ],
+    "minor": [
+      {"endpoint": "POST /api/bookings", "issue": "When non-approval resource is booked by a user whose BRS<85, booking goes to pending_approval instead of approved. If this is intentional, ensure UI surfaces it clearly; if not, tweak auto_approve rule."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "BrowseResources floor filter", "issue": "React hydration warning: <span> rendered inside <option> (can cause hydration errors)", "selector": "[data-testid=\"filter-floor\"] option", "priority": "LOW"}
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": ["/app/backend/tests/backend_test.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [
+    "Fix PUT /api/resources/{id} 500 — coerce type string -> ResourceType enum in update_resource (and also in create_resource for consistency).",
+    "Decide behavior for low-BRS users on non-approval resources (current: pending_approval). If desired, document it; otherwise let auto-approve proceed when resource doesn't require approval.",
+    "Clean up the <span> children inside <option> in BrowseResources.jsx to avoid React hydration warnings."
+  ],
+  "critical_code_review_comments": [
+    "routers/resources_routes.py: update_resource blindly setattrs body dict onto SQLAlchemy model; raw string overwrites Enum column -> 500 on read. Add field-by-field serialization or use ResourceType(value).",
+    "services.py auto_approve rule also requires BRS>=85 even when resource.requires_approval is False — this may surprise users (their own hot desk booking becomes pending). Review policy.",
+    "bookings_routes.py cancel flow increments owner.cancelled_count and recomputes BRS whenever owner cancels — makes end-to-end test suites degrade BRS quickly. Consider penalizing only late cancellations.",
+    "CORS middleware: allow_origins='*' with allow_credentials=False is fine, but DATABASE_URL and JWT_SECRET are committed to .env; rotate before production.",
+    "No rate limiting / brute-force lockout on /api/auth/login; auth_testing.md playbook requires lockout after 5 failures."
+  ],
+  "updated_files": ["/app/backend/tests/backend_test.py"],
+  "success_rate": {"backend": "95% (36/38)", "frontend": "smoke-passed"},
+  "test_credentials": "admin@company.com/admin123, manager@company.com/manager123, employee@company.com/employee123, employee2/employee3 @company.com/employee123",
+  "seed_data_creation": "Tests create TEST_-prefixed bookings & one TEST_AutoResource per run using random day+minute offsets to avoid collisions; no manual cleanup (soft-deleted resources + cancelled bookings remain in DB).",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Use REACT_APP_BACKEND_URL. Run: pytest /app/backend/tests/backend_test.py. The suite uses random day (0-15) + minute offsets within 30-day policy; parking test hard-codes day=1 (max_advance=14). After main agent fixes resource update bug, re-run that single test. Frontend was only smoke tested—deeper playwright coverage of booking form validation panel, approval queue, QR panel, check-in modal, maintenance dialog, policy editor, reports charts, floor map, calendars still recommended.",
+  "rca_of_the_issue": "PUT /api/resources/{id} 500: In routers/resources_routes.py update_resource, `for k,v in data.items(): setattr(r,k,v)` overwrites r.type (Enum column) with a plain string; when _to_out() then accesses r.type.value, SQLAlchemy has not re-coerced it, so Python raises AttributeError. Reproduce by PUT-ing any valid ResourceIn payload to an existing resource as admin. Mitigation: either pop `type` and call `r.type = ResourceType(data['type'])`, or refresh(r) from DB before serializing so Enum coercion re-applies."
+}

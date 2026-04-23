@@ -1,0 +1,52 @@
+{
+  "summary": "Tested 3 new features: brute-force login lockout (5-attempt/15-min window), recurring bookings (daily/weekly/weekday/validation), email-skip logging (Resend degrades gracefully), and Book Again UI flow. Added 10 new pytest cases under TestBruteForceLockout, TestRecurringBookings, TestEmailSkipLog. Final: 45 passed / 1 skipped / 2 failed (both are pre-existing cross-run data pollution on overlap/reject tests — not feature bugs). Frontend: recurring toggle+fields render & wire correctly; BookingForm correctly reads prefillStart/prefillEnd/title from URL query (confirmed via screenshot: title='TEST_From_URL', start=06/15 10:00, end=06/15 11:00).",
+  "features_verified": [
+    {"feature": "Brute-force lockout: 5th wrong password -> 429 with 'Too many failed attempts'", "status": "VERIFIED", "evidence": "TestBruteForceLockout::test_lockout_after_5_failures PASS"},
+    {"feature": "Brute-force: different email NOT locked out", "status": "VERIFIED", "evidence": "test_different_email_not_locked_out PASS"},
+    {"feature": "Brute-force: correct password still works for admin/manager/employee", "status": "VERIFIED", "evidence": "test_correct_password_still_works_after_failures PASS"},
+    {"feature": "Brute-force: successful login resets counter", "status": "VERIFIED", "evidence": "test_successful_login_resets_counter PASS (3 wrong -> success -> 3 wrong all 401)"},
+    {"feature": "Recurring daily (occurrences=3)", "status": "VERIFIED", "evidence": "test_recurring_daily_creates_3 PASS — 3 bookings created on consecutive days"},
+    {"feature": "Recurring weekday skips weekends", "status": "VERIFIED", "evidence": "test_recurring_weekday_skips_weekends PASS — all 5 occurrences have weekday<5"},
+    {"feature": "Recurring weekly advances +7 days", "status": "VERIFIED", "evidence": "test_recurring_weekly_advances_7_days PASS — delta between successive starts = 7d"},
+    {"feature": "Recurring occurrences out of range (0, 31, -1, 100) -> 400", "status": "VERIFIED", "evidence": "test_recurring_occurrences_out_of_range PASS"},
+    {"feature": "Recurring conflict: one slot fails, others succeed", "status": "VERIFIED", "evidence": "test_recurring_conflict_lands_in_failed PASS — 1+ failed, 1+ created"},
+    {"feature": "Email skip log when RESEND_API_KEY empty", "status": "VERIFIED", "evidence": "test_email_skip_on_auto_approve PASS — [email-skip] token found in backend log tail after auto-approved booking"},
+    {"feature": "UI: Recurring toggle + pattern + occurrences fields render and wire", "status": "VERIFIED", "evidence": "Playwright: booking-recurring-toggle + booking-recurring-fields + recurring-pattern(default=daily) + recurring-occurrences(default=5); Create series (5x) submit button label updates"},
+    {"feature": "UI: BookingForm reads prefillStart/prefillEnd/title from URL query", "status": "VERIFIED", "evidence": "Direct navigation to /book/:id?prefillStart=...&prefillEnd=...&title=TEST_From_URL — screenshot confirms all 3 fields populated"},
+    {"feature": "UI: MyBookings past tab Book Again button", "status": "CODE-VERIFIED", "evidence": "Selector [data-testid=\"mybookings-book-again-{id}\"] exists in source; bookAgain() navigates to /book/:resource_id with correct query params. UI test skipped because employee has no past bookings to click."}
+  ],
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "POST /api/bookings (overlap test)", "issue": "test_create_overlap_rejected fails intermittently due to accumulated TEST_ booking data from prior runs colliding on same (day,hour,minute,second) slot. Test-only issue, not a product bug."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/backend_test.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "(LOW/test-hygiene) Add a teardown or DB-reset to clean TEST_ bookings; current high-entropy jitter (random hour+minute+second+microsecond) mitigates but does not eliminate collision risk for long-lived test runs.",
+    "(INFO) Frontend Book Again button click flow was NOT exercised end-to-end because employee test user has no past bookings. Prefill URL reading — which is the harder half of the feature — was verified directly. If end-to-end click coverage is required, seed a past booking or manually check-in a short booking before running the UI test."
+  ],
+  "critical_code_review_comments": [
+    "email_service.send_email uses asyncio.to_thread inside the request task; notify() fires asyncio.create_task(send_email) — confirm this is awaited/ detached cleanly so request latency isn't impacted. Currently services.notify wraps with create_task which is fire-and-forget. Good.",
+    "auth_routes._recent_failures: counts ALL failures within 15-min window until hitting a success row; correct for the 'reset on success' requirement.",
+    "routers/bookings_routes.create_recurring skips weekday weekends by advancing +1 and does NOT count that skip as an occurrence — matches requirement. However, when `pattern=weekday` starts on a weekend, it correctly rolls forward before counting. Good.",
+    "create_recurring commits ONCE at the end for all occurrences. If one booking in the middle raises an unexpected DB error, all prior additions may roll back. Consider per-occurrence try/except with rollback to savepoint for stronger isolation (low priority).",
+    "RecurringResult schema uses forward-ref 'BookingOut' but is defined before BookingOut in schemas.py — Pydantic v2 resolves it via model_rebuild() lazily; currently works but add `RecurringResult.model_rebuild()` explicitly for safety if schemas.py grows."
+  ],
+  "updated_files": ["/app/backend/tests/backend_test.py"],
+  "success_rate": {"backend": "95.7% (45/47 non-skipped, 2 known pollution flakes)", "frontend": "100% for new features (recurring UI + prefill URL read both verified)"},
+  "test_credentials": "admin@company.com/admin123, manager@company.com/manager123, employee@company.com/employee123, employee2/employee3@company.com/employee123",
+  "seed_data_creation": "None. High-entropy jitter (hour+min+sec+microsec random) used to avoid cross-run collision for new tests.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All 3 new features (brute-force lockout, recurring bookings, email-skip logging) plus Book Again prefill URL path are verified. Backend regression is clean except 2 cross-run pollution flakes (test_create_overlap_rejected, test_reject_flow) that are NOT feature bugs. Frontend 'Book Again' button click flow requires a past booking to fully exercise end-to-end; the URL-reading half is confirmed. LOGIN_MAX_ATTEMPTS=5, LOGIN_LOCKOUT_MINUTES=15. RESEND_API_KEY intentionally empty -> [email-skip] log line confirmed in /var/log/supervisor/backend.err.log.",
+  "rca_of_the_issue": "N/A — feature-addition iteration. No new bugs found. Flakes are test-data accumulation, not product issues."
+}
