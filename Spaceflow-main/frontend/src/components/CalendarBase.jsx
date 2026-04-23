@@ -12,12 +12,12 @@ const locales = { "en-US": enUS };
 const localizer = dateFnsLocalizer({ format, parse, startOfWeek, getDay, locales });
 
 const STATE_COLOR = {
-  approved: "#2563EB",
-  pending_approval: "#D97706",
-  checked_in: "#16A34A",
-  no_show_warning: "#EA580C",
-  completed: "#0F172A",
-  extension_pending: "#7C3AED",
+  approved: "#475569",
+  pending_approval: "#94a3b8",
+  checked_in: "#334155",
+  no_show_warning: "#64748b",
+  completed: "#1e293b",
+  extension_pending: "#475569",
 };
 
 export default function CalendarBase({ endpoint, title, subtitle, eyebrow = "Calendar", testid = "calendar-page" }) {
@@ -42,22 +42,22 @@ export default function CalendarBase({ endpoint, title, subtitle, eyebrow = "Cal
   const eventPropGetter = useMemo(
     () => (event) => ({
       style: {
-        backgroundColor: STATE_COLOR[event.resource.state] || "#2563EB",
-        borderRadius: 4,
+        backgroundColor: STATE_COLOR[event.resource.state] || "#475569",
+        borderRadius: 2,
       },
     }),
     [],
   );
 
   return (
-    <div data-testid={testid} className="space-y-4">
+    <div data-testid={testid} className="space-y-6">
       <div>
-        <div className="text-[10px] uppercase tracking-[0.3em] font-bold text-blue-600 mb-1">{eyebrow}</div>
-        <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">{title}</h1>
-        {subtitle && <p className="text-sm text-slate-600 mt-1">{subtitle}</p>}
+        <div className="sf-section-title">{eyebrow}</div>
+        <h1 className="sf-page-title">{title}</h1>
+        {subtitle && <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>}
       </div>
 
-      <div className="bg-white rounded-lg border border-slate-200 p-4" style={{ height: 680 }}>
+      <div className="bg-card rounded-xl border border-border p-4" style={{ height: 680 }}>
         <Calendar
           localizer={localizer}
           events={events}
