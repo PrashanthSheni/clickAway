@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { api, formatApiErrorDetail } from "../lib/api";
 import { toast } from "sonner";
-import { Plus, Pencil, Wrench, Trash2, X, Loader2 } from "lucide-react";
+import { Plus, Pencil, Wrench, Trash2, X, Loader2, Upload, Image as ImageIcon } from "lucide-react";
 import { Link } from "react-router-dom";
+import { BACKEND_URL } from "../lib/api";
 
 const EMPTY_RES = {
   name: "", type: "room", description: "", floor: 1, building: "HQ",
@@ -16,8 +17,31 @@ const EMPTY_RES = {
 function ResourceDialog({ open, initial, onClose, onSaved }) {
   const [form, setForm] = useState(initial || EMPTY_RES);
   const [busy, setBusy] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
   useEffect(() => setForm(initial || EMPTY_RES), [initial, open]);
   if (!open) return null;
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const { data } = await api.post("/resources/upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      upd("image_url", data.url);
+      toast.success("Image uploaded");
+    } catch (err) {
+      toast.error("Failed to upload image");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const save = async () => {
     setBusy(true);
@@ -90,6 +114,40 @@ function ResourceDialog({ open, initial, onClose, onSaved }) {
             <div className="col-span-2">
               <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">Amenities (comma-separated)</label>
               <input data-testid="res-form-amenities" value={Array.isArray(form.amenities) ? form.amenities.join(", ") : form.amenities} onChange={(e) => upd("amenities", e.target.value)} className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm" />
+            </div>
+
+            <div className="col-span-2 space-y-2">
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">Resource Image</label>
+              <div className="flex items-center gap-4">
+                <div className="w-24 h-24 rounded-lg bg-slate-100 border-2 border-dashed border-slate-300 flex items-center justify-center overflow-hidden">
+                  {form.image_url ? (
+                    <img 
+                      src={form.image_url.startsWith("http") ? form.image_url : `${BACKEND_URL}${form.image_url}`} 
+                      alt="Preview" 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <ImageIcon size={24} className="text-slate-400" />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <input 
+                    type="file" 
+                    id="resource-image-upload" 
+                    className="hidden" 
+                    accept="image/*"
+                    onChange={handleFileChange}
+                  />
+                  <label 
+                    htmlFor="resource-image-upload"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 rounded-md text-sm font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer transition-colors"
+                  >
+                    {uploading ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+                    {form.image_url ? "Change image" : "Upload image"}
+                  </label>
+                  <p className="text-[10px] text-slate-500 mt-1">PNG, JPG, or WEBP up to 5MB</p>
+                </div>
+              </div>
             </div>
             <label className="inline-flex items-center gap-2 text-sm">
               <input type="checkbox" data-testid="res-form-req-approval" checked={form.requires_approval} onChange={(e) => upd("requires_approval", e.target.checked)} />

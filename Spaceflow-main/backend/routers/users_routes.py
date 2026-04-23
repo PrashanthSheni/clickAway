@@ -5,9 +5,9 @@ from typing import List
 
 from database import get_db
 from models import User, Notification, NotificationType
-from schemas import UserOut
+from schemas import UserOut, ManagerHierarchy, UserUpdate, DeleteUserIn
 from auth import get_current_user, require_roles
-from email_service import send_email, tpl_account_approved, tpl_account_rejected
+from email_service import send_email, tpl_account_approved, tpl_account_rejected, tpl_account_deleted
 import os
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -30,6 +30,25 @@ async def list_users(db: AsyncSession = Depends(get_db), user: User = Depends(re
     else:
         res = await db.execute(select(User).order_by(User.name))
     return [_to_out(u) for u in res.scalars().all()]
+    
+@router.get("/hierarchy", response_model=List[ManagerHierarchy])
+async def get_user_hierarchy(db: AsyncSession = Depends(get_db), user: User = Depends(require_roles("admin"))):
+    # Fetch all managers
+    managers_res = await db.execute(select(User).where(User.role == "manager").order_by(User.name))
+    managers = managers_res.scalars().all()
+    
+    hierarchy = []
+    for manager in managers:
+        employees_res = await db.execute(select(User).where(User.manager_id == manager.id).order_by(User.name))
+        employees = employees_res.scalars().all()
+        hierarchy.append(ManagerHierarchy(
+            manager=_to_out(manager),
+            employees=[_to_out(e) for e in employees]
+        ))
+    
+    # Also handle employees with no manager? Or admins who have employees?
+    # Usually, hierarchy is Manager -> Employee.
+    return hierarchy
 
 @router.get("/pending", response_model=List[UserOut])
 async def list_pending_users(db: AsyncSession = Depends(get_db), user: User = Depends(require_roles("manager", "admin"))):
@@ -104,3 +123,38 @@ async def get_user(user_id: str, db: AsyncSession = Depends(get_db), user: User 
     if not u:
         raise HTTPException(status_code=404, detail="User not found")
     return _to_out(u)
+    
+@router.put("/{user_id}", response_model=UserOut)
+async def update_user(user_id: str, data: UserUpdate, db: AsyncSession = Depends(get_db), user: User = Depends(require_roles("admin"))):
+    res = await db.execute(select(User).where(User.id == user_id))
+    u = res.scalar_one_or_none()
+    if not u:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if data.name is not None: u.name = data.name
+    if data.email is not None: u.email = data.email
+    if data.role is not None: u.role = data.role
+    if data.department is not None: u.department = data.department
+    if data.manager_id is not None: u.manager_id = data.manager_id
+    
+    await db.commit()
+    await db.refresh(u)
+    return _to_out(u)
+
+@router.delete("/{user_id}")
+async def delete_user(user_id: str, data: DeleteUserIn, db: AsyncSession = Depends(get_db), user: User = Depends(require_roles("admin"))):
+    res = await db.execute(select(User).where(User.id == user_id))
+    u = res.scalar_one_or_none()
+    if not u:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Send email notification before deletion
+    subject, html = tpl_account_deleted(u.name, data.reason)
+    import asyncio
+    asyncio.create_task(send_email(u.email, subject, html))
+    
+    # Delete the user
+    await db.delete(u)
+    await db.commit()
+    
+    return {"message": "User deleted successfully"}

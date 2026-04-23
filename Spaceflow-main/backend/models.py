@@ -73,7 +73,8 @@ class User(Base):
     cancelled_count: Mapped[int] = mapped_column(Integer, default=0)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
-    bookings = relationship("Booking", back_populates="user", foreign_keys="Booking.user_id")
+    bookings = relationship("Booking", back_populates="user", foreign_keys="Booking.user_id", cascade="all, delete-orphan")
+    notifications = relationship("Notification", cascade="all, delete-orphan")
 
 
 class VerificationCode(Base):
@@ -126,7 +127,7 @@ class Booking(Base):
     __tablename__ = "bookings"
 
     id: Mapped[str] = mapped_column(String, primary_key=True, default=uuid_str)
-    user_id: Mapped[str] = mapped_column(String, ForeignKey("users.id"), index=True)
+    user_id: Mapped[str] = mapped_column(String, ForeignKey("users.id", ondelete="CASCADE"), index=True)
     resource_id: Mapped[str] = mapped_column(String, ForeignKey("resources.id"), index=True)
     title: Mapped[str] = mapped_column(String, default="")
     notes: Mapped[str] = mapped_column(Text, default="")
@@ -146,6 +147,7 @@ class Booking(Base):
     resource = relationship("Resource")
     events = relationship("BookingEvent", back_populates="booking", cascade="all, delete-orphan")
     extensions = relationship("ExtensionRequest", back_populates="booking", cascade="all, delete-orphan")
+    alternative_suggestions = relationship("AlternativeSuggestion", cascade="all, delete-orphan")
 
 
 class BookingEvent(Base):
@@ -193,7 +195,7 @@ class Notification(Base):
     __tablename__ = "notifications"
 
     id: Mapped[str] = mapped_column(String, primary_key=True, default=uuid_str)
-    user_id: Mapped[str] = mapped_column(String, ForeignKey("users.id"), index=True)
+    user_id: Mapped[str] = mapped_column(String, ForeignKey("users.id", ondelete="CASCADE"), index=True)
     type: Mapped[NotificationType] = mapped_column(Enum(NotificationType))
     title: Mapped[str] = mapped_column(String)
     message: Mapped[str] = mapped_column(Text, default="")
@@ -206,7 +208,7 @@ class AlternativeSuggestion(Base):
     __tablename__ = "alternative_suggestions"
 
     id: Mapped[str] = mapped_column(String, primary_key=True, default=uuid_str)
-    booking_id: Mapped[str] = mapped_column(String, index=True)
+    booking_id: Mapped[str] = mapped_column(String, ForeignKey("bookings.id", ondelete="CASCADE"), index=True)
     resource_id: Mapped[str] = mapped_column(String)
     suggested_start: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     suggested_end: Mapped[datetime] = mapped_column(DateTime(timezone=True))

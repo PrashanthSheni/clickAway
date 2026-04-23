@@ -77,9 +77,9 @@ async def overlapping_bookings(
         Booking.start_time < end,
         Booking.end_time > start,
         Booking.state.in_([
-            BookingState.approved, BookingState.pending_approval,
-            BookingState.checked_in, BookingState.no_show_warning,
-            BookingState.extension_pending,
+            BookingState.approved,
+            BookingState.checked_in,
+            BookingState.no_show_warning,
         ]),
     )
     if exclude_booking_id:

@@ -8,6 +8,7 @@ import os
 import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, APIRouter
+from fastapi.staticfiles import StaticFiles
 from starlette.middleware.cors import CORSMiddleware
 
 from database import engine, Base, AsyncSessionLocal
@@ -73,6 +74,13 @@ api_router.include_router(calendar_router)
 api_router.include_router(users_router)
 
 app.include_router(api_router)
+
+# Ensure uploads directory exists
+UPLOAD_DIR = ROOT_DIR / "static" / "uploads"
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+# Mount static files for images
+app.mount("/static", StaticFiles(directory=ROOT_DIR / "static"), name="static")
 
 app.add_middleware(
     CORSMiddleware,

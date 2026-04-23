@@ -24,6 +24,10 @@ class UserOut(BaseModel):
     no_show_count: int
     cancelled_count: int
 
+class ManagerHierarchy(BaseModel):
+    manager: UserOut
+    employees: List[UserOut]
+
 class RegisterIn(BaseModel):
     name: str
     email: EmailStr
@@ -32,6 +36,16 @@ class RegisterIn(BaseModel):
     pending_manager_name: Optional[str] = None
     pending_manager_email: Optional[EmailStr] = None
     verification_code: str
+
+class UserUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    role: Optional[str] = None
+    department: Optional[str] = None
+    manager_id: Optional[str] = None
+
+class DeleteUserIn(BaseModel):
+    reason: str
 
 class SendVerificationCodeIn(BaseModel):
     email: EmailStr
@@ -135,6 +149,7 @@ class BookingOut(BaseModel):
     # Enriched
     user_name: Optional[str] = None
     resource_name: Optional[str] = None
+    ai_priority: Optional[int] = None
 
 
 class ValidationIssue(BaseModel):

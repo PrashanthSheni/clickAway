@@ -253,4 +253,17 @@ def tpl_account_rejected(user_name: str) -> tuple[str, str]:
         <br><br>Please contact your administrator if you believe this was a mistake.""",
     )
     return subject, html
+
+
+def tpl_account_deleted(user_name: str, reason: str) -> tuple[str, str]:
+    subject = "Spaceflow — Account Deleted"
+    html = _wrap(
+        "Your account was deleted.",
+        f"""Hi <strong>{user_name}</strong>,<br><br>
+        Your account on Spaceflow has been <strong style="color:#DC2626;">deleted</strong> by an administrator.<br><br>
+        <strong>Reason:</strong><br>
+        <blockquote style="margin:12px 0;padding:10px 12px;border-left:3px solid {_BORDER};color:#334155;">{reason or 'No reason provided.'}</blockquote>
+        <br>If you believe this was an error, please contact your IT department.""",
+    )
+    return subject, html
  

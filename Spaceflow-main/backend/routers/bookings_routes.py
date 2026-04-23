@@ -19,6 +19,7 @@ from services import (
     validate_booking, gen_check_in_code, gen_qr_token, qr_png_base64,
     can_transition, notify, recompute_user_score, enrich_booking,
 )
+from ai_service import prioritize_bookings
 import email_service
 import os
 
@@ -29,7 +30,9 @@ def _app_link(path: str) -> str:
 
 
 def _fmt_when(b: Booking) -> str:
-    return b.start_time.strftime("%a %b %d, %Y %H:%M UTC")
+    # Convert UTC to IST (UTC + 5:30)
+    ist_time = b.start_time + timedelta(hours=5, minutes=30)
+    return ist_time.strftime("%a %b %d, %Y %I:%M %p IST")
 
 router = APIRouter(prefix="/bookings", tags=["bookings"])
 
@@ -172,6 +175,37 @@ async def pending_approvals(
     return [BookingOut(**e) for e in enriched]
 
 
+@router.post("/prioritize", response_model=List[BookingOut])
+async def prioritize_queue(
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(require_roles("manager", "admin")),
+):
+    # Get the pending queue
+    stmt = select(Booking).where(
+        or_(
+            Booking.state == BookingState.pending_approval,
+            Booking.state == BookingState.extension_pending,
+        )
+    )
+    if user.role.value == "manager":
+        team = (await db.execute(select(User).where(User.manager_id == user.id))).scalars().all()
+        ids = [u.id for u in team]
+        stmt = stmt.where(Booking.user_id.in_(ids)) if ids else stmt.where(Booking.user_id == "__none__")
+    
+    res = await db.execute(stmt)
+    bookings = list(res.scalars().all())
+    if not bookings:
+        return []
+
+    # Enrich bookings
+    enriched = await _list_enriched(db, bookings)
+    
+    # Run through AI prioritization
+    prioritized = await prioritize_bookings(enriched)
+    
+    return [BookingOut(**e) for e in prioritized]
+
+
 @router.get("/{booking_id}", response_model=BookingOut)
 async def get_booking(booking_id: str, db: AsyncSession = Depends(get_db), user: User = Depends(get_current_user)):
     b = (await db.execute(select(Booking).where(Booking.id == booking_id))).scalar_one_or_none()
@@ -252,6 +286,19 @@ async def approve_booking(
         raise HTTPException(status_code=404, detail="Booking not found")
     if b.state not in (BookingState.pending_approval, BookingState.extension_pending):
         raise HTTPException(status_code=400, detail=f"Cannot approve from state '{b.state.value}'.")
+
+    from services import overlapping_bookings
+    overlaps = await overlapping_bookings(db, b.resource_id, b.start_time, b.end_time, exclude_booking_id=b.id)
+    if overlaps:
+        # Check if it's a parking spot (which can have multiple overlaps)
+        resource = (await db.execute(select(Resource).where(Resource.id == b.resource_id))).scalar_one()
+        if resource.type.value != "parking":
+            raise HTTPException(status_code=400, detail="Another booking was approved for this slot while this request was pending.")
+        else:
+            # For parking, check total capacity
+            used = sum(o.capacity_requested for o in overlaps)
+            if used + b.capacity_requested > resource.capacity:
+                raise HTTPException(status_code=400, detail=f"Resource capacity reached ({used}/{resource.capacity} used).")
 
     from_state = b.state.value
     if b.state == BookingState.extension_pending:

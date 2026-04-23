@@ -16,7 +16,9 @@ def _app_link(path: str) -> str:
 
 
 def _fmt_when(b: Booking) -> str:
-    return b.start_time.strftime("%a %b %d, %Y %H:%M UTC")
+    # Convert UTC to IST (UTC + 5:30)
+    ist_time = b.start_time + timedelta(hours=5, minutes=30)
+    return ist_time.strftime("%a %b %d, %Y %I:%M %p IST")
 
 
 CHECK_IN_EARLY_MIN = 10

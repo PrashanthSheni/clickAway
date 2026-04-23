@@ -1,4 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, File, UploadFile
+import shutil
+import os
+import uuid
+from pathlib import Path
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from typing import List
@@ -9,6 +13,28 @@ from schemas import ResourceIn, ResourceOut, PolicyIn, PolicyOut
 from auth import get_current_user, require_roles
 
 router = APIRouter(prefix="/resources", tags=["resources"])
+
+@router.post("/upload")
+async def upload_image(
+    file: UploadFile = File(...),
+    _: User = Depends(require_roles("admin")),
+):
+    # Determine base directory
+    backend_dir = Path(__file__).parent.parent
+    upload_dir = backend_dir / "static" / "uploads"
+    upload_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Generate unique filename
+    ext = os.path.splitext(file.filename)[1]
+    filename = f"{uuid.uuid4()}{ext}"
+    file_path = upload_dir / filename
+    
+    # Save file
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+        
+    # Return URL (relative to root)
+    return {"url": f"/static/uploads/{filename}"}
 
 
 def _to_out(r: Resource) -> ResourceOut:

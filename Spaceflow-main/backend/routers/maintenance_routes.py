@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from datetime import timedelta
 from typing import List
 
 from database import get_db
@@ -92,7 +93,8 @@ async def create_maintenance(
         from models import Resource as _R
         owner = (await db.execute(select(User).where(User.id == b.user_id))).scalar_one_or_none()
         resource_name = (await db.execute(select(_R).where(_R.id == b.resource_id))).scalar_one().name
-        when_s = b.start_time.strftime("%a %b %d, %Y %H:%M UTC")
+        ist_time = b.start_time + timedelta(hours=5, minutes=30)
+        when_s = ist_time.strftime("%a %b %d, %Y %I:%M %p IST")
         subject, html = email_service.tpl_maintenance_impact(
             owner.name if owner else "there", resource_name, when_s, body.reason,
             _app_link("/browse"),

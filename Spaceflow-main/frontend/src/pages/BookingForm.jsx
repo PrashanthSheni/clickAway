@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
-import { api, formatApiErrorDetail } from "../lib/api";
+import { api, formatApiErrorDetail, BACKEND_URL } from "../lib/api";
 import { toast } from "sonner";
 import { ArrowLeft, Loader2, CheckCircle2, AlertTriangle, AlertCircle, Sparkles } from "lucide-react";
 
@@ -137,11 +137,22 @@ export default function BookingForm() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <form onSubmit={onSubmit} className="lg:col-span-2 bg-white rounded-lg border border-slate-200 p-6 space-y-4">
-          <div>
-            <div className="text-[10px] uppercase tracking-[0.3em] font-bold text-blue-600 mb-1">Book</div>
-            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900">{resource.name}</h2>
-            <div className="text-sm text-slate-600 mt-1">
-              {resource.type.toUpperCase()} · Floor {resource.floor} · Capacity {resource.capacity}
+          <div className="flex flex-col sm:flex-row gap-4">
+            {resource.image_url && (
+              <div className="w-full sm:w-32 h-32 rounded-lg bg-slate-100 overflow-hidden flex-shrink-0 border border-slate-200">
+                <img 
+                  src={resource.image_url.startsWith("http") ? resource.image_url : `${BACKEND_URL}${resource.image_url}`} 
+                  alt={resource.name} 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+            <div>
+              <div className="text-[10px] uppercase tracking-[0.3em] font-bold text-blue-600 mb-1">Book</div>
+              <h2 className="text-3xl font-extrabold tracking-tight text-slate-900">{resource.name}</h2>
+              <div className="text-sm text-slate-600 mt-1">
+                {resource.type.toUpperCase()} · Floor {resource.floor} · Capacity {resource.capacity}
+              </div>
             </div>
           </div>
 
