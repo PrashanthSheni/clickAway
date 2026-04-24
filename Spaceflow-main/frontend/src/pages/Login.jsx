@@ -5,8 +5,8 @@ import { formatApiErrorDetail } from "../lib/api";
 import { Loader2, Zap, CheckCircle } from "lucide-react";
 
 const DEMO = [
-  { label: "Admin",    email: "admin@company.com",    password: "admin123",    color: "#6366F1" },
-  { label: "Manager",  email: "manager@company.com",  password: "manager123",  color: "#10B981" },
+  { label: "Admin", email: "admin@company.com", password: "admin123", color: "#6366F1" },
+  { label: "Manager", email: "manager@company.com", password: "manager123", color: "#10B981" },
   { label: "Employee", email: "employee@company.com", password: "employee123", color: "#F59E0B" },
 ];
 
@@ -19,12 +19,12 @@ const FEATURES = [
 
 export default function Login() {
   const { login } = useAuth();
-  const navigate  = useNavigate();
-  const location  = useLocation();
-  const [email,    setEmail]    = useState("admin@company.com");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [email, setEmail] = useState("admin@company.com");
   const [password, setPassword] = useState("admin123");
-  const [err,      setErr]      = useState("");
-  const [busy,     setBusy]     = useState(false);
+  const [err, setErr] = useState("");
+  const [busy, setBusy] = useState(false);
   const from = location.state?.from?.pathname || "/";
 
   const onSubmit = async (e) => {
@@ -39,7 +39,7 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex bg-[#F0F2F5]">
-      
+
       {/* ── Left hero panel ── */}
       <div className="hidden lg:flex lg:w-1/2 relative bg-[#0F172A] overflow-hidden flex-col justify-between p-12">
         {/* Decorative circles */}
@@ -60,7 +60,7 @@ export default function Login() {
             <Zap size={20} className="text-white" />
           </div>
           <div>
-            <div className="text-white font-extrabold tracking-tight text-lg leading-none">Spaceflow</div>
+            <div className="text-white font-extrabold tracking-tight text-lg leading-none">clickAway</div>
             <div className="text-indigo-400 text-[10px] font-semibold uppercase tracking-widest">Resource Suite</div>
           </div>
         </div>
@@ -91,7 +91,7 @@ export default function Login() {
 
         {/* Stats row */}
         <div className="relative z-10 grid grid-cols-3 gap-6 pt-8 border-t border-white/10">
-          {[["97%","On-time checkins"],["3.2×","Faster booking"],["0","Double-bookings"]].map(([k,v]) => (
+          {[["97%", "On-time checkins"], ["3.2×", "Faster booking"], ["0", "Double-bookings"]].map(([k, v]) => (
             <div key={v}>
               <div className="text-2xl font-black text-white tracking-tight">{k}</div>
               <div className="text-[10px] uppercase tracking-wider text-indigo-400/80 font-semibold mt-0.5">{v}</div>
@@ -108,7 +108,7 @@ export default function Login() {
             <div className="h-8 w-8 rounded-lg bg-indigo-600 flex items-center justify-center">
               <Zap size={16} className="text-white" />
             </div>
-            <span className="font-extrabold text-gray-900">Spaceflow</span>
+            <span className="font-extrabold text-gray-900">clickAway</span>
           </div>
 
           {/* Heading */}

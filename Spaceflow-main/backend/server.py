@@ -51,6 +51,16 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Smart Resource Booking", lifespan=lifespan)
 
+# CORS configuration — Must be before routers
+origins = os.environ.get("CORS_ORIGINS", "http://localhost:3000,http://localhost:3001,http://localhost:5173").split(",")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 api_router = APIRouter(prefix="/api")
 
 
@@ -81,11 +91,3 @@ UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 # Mount static files for images
 app.mount("/static", StaticFiles(directory=ROOT_DIR / "static"), name="static")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=os.environ.get("CORS_ORIGINS", "*").split(","),
-    allow_credentials=False,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)

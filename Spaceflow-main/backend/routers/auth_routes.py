@@ -125,7 +125,7 @@ async def send_verification_code(body: SendVerificationCodeIn, db: AsyncSession 
     await db.commit()
     
     html_content = f"Your verification code is: <strong>{code}</strong>"
-    await send_email(to=email, subject="Spaceflow Registration Code", html=html_content, text=f"Your verification code is: {code}")
+    await send_email(to=email, subject="clickAway Registration Code", html=html_content, text=f"Your verification code is: {code}")
     
     # Print the code to the console for testing since RESEND_API_KEY is empty
     print(f"\n" + "="*50)

@@ -40,7 +40,7 @@ export default function Auth() {
       toast.error("Manager email is required for employees");
       return;
     }
-    
+
     setLoading(true);
     try {
       const res = await fetch("http://localhost:8000/api/auth/send-verification-code", {
@@ -50,7 +50,7 @@ export default function Auth() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || "Failed to send code");
-      
+
       toast.success("Verification code sent to your email!");
       setStep(2);
     } catch (err) {
@@ -71,7 +71,7 @@ export default function Auth() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || "Registration failed");
-      
+
       toast.success("Registration successful! Your account is pending approval.");
       setIsLogin(true);
       setStep(1);
@@ -90,13 +90,13 @@ export default function Auth() {
     <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <h2 className="mt-6 text-center text-3xl font-extrabold text-slate-900 tracking-tight">
-          {isLogin ? "Sign in to Spaceflow" : "Create an account"}
+          {isLogin ? "Sign in to clickAway" : "Create an account"}
         </h2>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-slate-200">
-          
+
           {isLogin ? (
             <form onSubmit={handleLoginSubmit} className="space-y-6">
               <div>
@@ -106,7 +106,7 @@ export default function Auth() {
                     type="email"
                     required
                     value={formData.email}
-                    onChange={e => setFormData({...formData, email: e.target.value})}
+                    onChange={e => setFormData({ ...formData, email: e.target.value })}
                     className="appearance-none block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   />
                 </div>
@@ -119,7 +119,7 @@ export default function Auth() {
                     type="password"
                     required
                     value={formData.password}
-                    onChange={e => setFormData({...formData, password: e.target.value})}
+                    onChange={e => setFormData({ ...formData, password: e.target.value })}
                     className="appearance-none block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   />
                 </div>
@@ -145,7 +145,7 @@ export default function Auth() {
                       type="text"
                       required
                       value={formData.name}
-                      onChange={e => setFormData({...formData, name: e.target.value})}
+                      onChange={e => setFormData({ ...formData, name: e.target.value })}
                       className="mt-1 appearance-none block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     />
                   </div>
@@ -155,7 +155,7 @@ export default function Auth() {
                       type="email"
                       required
                       value={formData.email}
-                      onChange={e => setFormData({...formData, email: e.target.value})}
+                      onChange={e => setFormData({ ...formData, email: e.target.value })}
                       className="mt-1 appearance-none block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     />
                   </div>
@@ -165,7 +165,7 @@ export default function Auth() {
                       type="password"
                       required
                       value={formData.password}
-                      onChange={e => setFormData({...formData, password: e.target.value})}
+                      onChange={e => setFormData({ ...formData, password: e.target.value })}
                       className="mt-1 appearance-none block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     />
                   </div>
@@ -173,7 +173,7 @@ export default function Auth() {
                     <label className="block text-sm font-medium text-slate-700">Role</label>
                     <select
                       value={formData.role}
-                      onChange={e => setFormData({...formData, role: e.target.value})}
+                      onChange={e => setFormData({ ...formData, role: e.target.value })}
                       className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-slate-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                     >
                       <option value="employee">Employee</option>
@@ -188,7 +188,7 @@ export default function Auth() {
                         <input
                           type="text"
                           value={formData.pending_manager_name}
-                          onChange={e => setFormData({...formData, pending_manager_name: e.target.value})}
+                          onChange={e => setFormData({ ...formData, pending_manager_name: e.target.value })}
                           className="mt-1 appearance-none block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         />
                       </div>
@@ -198,7 +198,7 @@ export default function Auth() {
                           type="email"
                           required
                           value={formData.pending_manager_email}
-                          onChange={e => setFormData({...formData, pending_manager_email: e.target.value})}
+                          onChange={e => setFormData({ ...formData, pending_manager_email: e.target.value })}
                           className="mt-1 appearance-none block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         />
                       </div>
@@ -226,7 +226,7 @@ export default function Auth() {
                       type="text"
                       required
                       value={formData.verification_code}
-                      onChange={e => setFormData({...formData, verification_code: e.target.value})}
+                      onChange={e => setFormData({ ...formData, verification_code: e.target.value })}
                       className="mt-1 appearance-none block w-full px-3 py-2 text-center tracking-widest border border-slate-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-lg font-mono"
                       maxLength={6}
                     />
@@ -259,7 +259,7 @@ export default function Auth() {
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="px-2 bg-white text-slate-500">
-                  {isLogin ? "New to Spaceflow?" : "Already have an account?"}
+                  {isLogin ? "New to clickAway?" : "Already have an account?"}
                 </span>
               </div>
             </div>

@@ -10,20 +10,20 @@ import {
 
 // ── Nav items ────────────────────────────────────────────────
 const NAV_ITEMS = [
-  { to:"/dashboard",   icon:LayoutDashboard, label:"Dashboard",   roles:[] },
-  { to:"/browse",      icon:Boxes,           label:"Resources",   roles:[] },
-  { to:"/bookings",    icon:ListChecks,      label:"My Bookings", roles:[] },
-  { to:"/calendar",    icon:CalendarDays,    label:"Calendar",    roles:[] },
-  { to:"/floor-map",   icon:Map,             label:"Floor Map",   roles:[] },
-  { to:"/checkin",     icon:QrCode,          label:"Check-in",    roles:[] },
-  { to:"/manager/approvals",     icon:ShieldCheck, label:"Approvals",     roles:["manager","admin"] },
-  { to:"/manager/team-calendar", icon:CalendarDays, label:"Team Calendar", roles:["manager","admin"] },
-  { to:"/admin",           icon:LayoutDashboard, label:"Admin Console", roles:["admin"] },
-  { to:"/admin/resources", icon:Boxes,           label:"Resources Mgmt",roles:["admin"] },
-  { to:"/admin/policies",  icon:Settings,        label:"Policies",      roles:["admin"] },
-  { to:"/admin/bookings",  icon:ListChecks,      label:"All Bookings",  roles:["admin"] },
-  { to:"/admin/reports",   icon:BarChart3,       label:"Analytics",     roles:["admin"] },
-  { to:"/profile",     icon:UserCircle,      label:"Profile",     roles:[] },
+  { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard", roles: [] },
+  { to: "/browse", icon: Boxes, label: "Resources", roles: [] },
+  { to: "/bookings", icon: ListChecks, label: "My Bookings", roles: [] },
+  { to: "/calendar", icon: CalendarDays, label: "Calendar", roles: [] },
+  { to: "/floor-map", icon: Map, label: "Floor Map", roles: [] },
+  { to: "/checkin", icon: QrCode, label: "Check-in", roles: [] },
+  { to: "/manager/approvals", icon: ShieldCheck, label: "Approvals", roles: ["manager", "admin"] },
+  { to: "/manager/team-calendar", icon: CalendarDays, label: "Team Calendar", roles: ["manager", "admin"] },
+  { to: "/admin", icon: LayoutDashboard, label: "Admin Console", roles: ["admin"] },
+  { to: "/admin/resources", icon: Boxes, label: "Resources Mgmt", roles: ["admin"] },
+  { to: "/admin/policies", icon: Settings, label: "Policies", roles: ["admin"] },
+  { to: "/admin/bookings", icon: ListChecks, label: "All Bookings", roles: ["admin"] },
+  { to: "/admin/reports", icon: BarChart3, label: "Analytics", roles: ["admin"] },
+  { to: "/profile", icon: UserCircle, label: "Profile", roles: [] },
 ];
 
 // ── Radial item position ─────────────────────────────────────
@@ -65,7 +65,7 @@ function RadialMenu({ open, onClose, user, navigate }) {
       }}>
         {/* Radial items */}
         {items.map((item, i) => {
-          const pos   = getRadialPos(i, items.length, radius);
+          const pos = getRadialPos(i, items.length, radius);
           const delay = open ? i * 28 : (items.length - i) * 15;
           return (
             <button
@@ -119,12 +119,12 @@ function RadialMenu({ open, onClose, user, navigate }) {
 
 // ── Notifications ─────────────────────────────────────────────
 function NotifBell() {
-  const [items, setItems]   = useState([]);
-  const [open, setOpen]     = useState(false);
-  const ref                 = useRef(null);
+  const [items, setItems] = useState([]);
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
 
   const fetchNotifs = async () => {
-    try { const { data } = await api.get("/notifications/unread"); setItems(data); } catch (_) {}
+    try { const { data } = await api.get("/notifications/unread"); setItems(data); } catch (_) { }
   };
   useEffect(() => { fetchNotifs(); const t = setInterval(fetchNotifs, 30000); return () => clearInterval(t); }, []);
   useEffect(() => {
@@ -179,9 +179,9 @@ function NotifBell() {
 // ── Main Layout ───────────────────────────────────────────────
 export default function Layout() {
   const { user, logout } = useAuth();
-  const navigate         = useNavigate();
-  const location         = useLocation();
-  const [radial, setRadial]   = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [radial, setRadial] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [dark, setDark] = useState(localStorage.getItem("theme") === "dark");
 
@@ -199,7 +199,7 @@ export default function Layout() {
   useEffect(() => {
     const handler = (e) => {
       if ((e.key === "k" || e.key === "K") && !e.ctrlKey && !e.metaKey &&
-          !["INPUT","TEXTAREA","SELECT"].includes(e.target.tagName)) {
+        !["INPUT", "TEXTAREA", "SELECT"].includes(e.target.tagName)) {
         e.preventDefault();
         setRadial(v => !v);
       }
@@ -218,12 +218,11 @@ export default function Layout() {
       <div className="bg-rotating-glow opacity-50" />
 
       {/* ── Command Sidebar ── */}
-      <aside 
+      <aside
         onMouseEnter={() => setExpanded(true)}
         onMouseLeave={() => setExpanded(false)}
-        className={`fixed left-0 top-0 bottom-0 z-50 flex flex-col sf-sidebar-transition border-r sf-sidebar-bg backdrop-blur-2xl shadow-[1px_0_24px_rgba(0,0,0,0.05)] ${
-          expanded ? "w-64" : "w-20"
-        }`}
+        className={`fixed left-0 top-0 bottom-0 z-50 flex flex-col sf-sidebar-transition border-r sf-sidebar-bg backdrop-blur-2xl shadow-[1px_0_24px_rgba(0,0,0,0.05)] ${expanded ? "w-64" : "w-20"
+          }`}
         style={{
           background: "var(--sf-sidebar-bg)",
           borderColor: "var(--sf-sidebar-border)"
@@ -236,16 +235,15 @@ export default function Layout() {
               <Zap size={22} className="text-white fill-white" />
             </div>
             <div className={`transition-opacity duration-300 ${expanded ? "opacity-100" : "opacity-0 invisible"}`}>
-              <div className="text-lg font-black tracking-tight text-foreground leading-none">Spaceflow</div>
+              <div className="text-lg font-black tracking-tight text-foreground leading-none">clickAway</div>
               <div className="text-[10px] text-indigo-500 font-black uppercase tracking-widest mt-1">Enterprise</div>
             </div>
           </div>
 
           <button
             onClick={() => setRadial(true)}
-            className={`flex items-center gap-3 px-3 py-3 rounded-2xl bg-foreground text-background transition-all hover:opacity-90 group shadow-xl ${
-              expanded ? "w-full justify-start" : "w-12 justify-center"
-            }`}
+            className={`flex items-center gap-3 px-3 py-3 rounded-2xl bg-foreground text-background transition-all hover:opacity-90 group shadow-xl ${expanded ? "w-full justify-start" : "w-12 justify-center"
+              }`}
           >
             <Command size={18} className="text-indigo-400 group-hover:scale-110 transition-transform" />
             <span className={`text-xs font-bold whitespace-nowrap transition-opacity ${expanded ? "opacity-100" : "opacity-0 hidden"}`}>
@@ -263,10 +261,9 @@ export default function Layout() {
             {NAV_ITEMS.filter(n => (n.roles.length === 0 || n.roles.includes(user.role)) && !n.to.includes("/manager") && !n.to.includes("/admin") && n.to !== "/profile").map(item => (
               <NavLink key={item.to} to={item.to}
                 className={({ isActive }) =>
-                  `flex items-center gap-4 px-3.5 py-3 rounded-2xl transition-all group ${
-                    isActive
-                      ? "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 shadow-sm"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  `flex items-center gap-4 px-3.5 py-3 rounded-2xl transition-all group ${isActive
+                    ? "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 shadow-sm"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                   }`
                 }
               >
@@ -285,10 +282,9 @@ export default function Layout() {
               {NAV_ITEMS.filter(n => n.roles.includes("manager") && (user.role === "manager" || user.role === "admin")).map(item => (
                 <NavLink key={item.to} to={item.to}
                   className={({ isActive }) =>
-                    `flex items-center gap-4 px-3.5 py-3 rounded-2xl transition-all group ${
-                      isActive
-                        ? "bg-indigo-50 text-indigo-600 shadow-sm"
-                        : "text-gray-400 hover:text-gray-900 hover:bg-gray-50"
+                    `flex items-center gap-4 px-3.5 py-3 rounded-2xl transition-all group ${isActive
+                      ? "bg-indigo-50 text-indigo-600 shadow-sm"
+                      : "text-gray-400 hover:text-gray-900 hover:bg-gray-50"
                     }`
                   }
                 >
@@ -308,10 +304,9 @@ export default function Layout() {
               {NAV_ITEMS.filter(n => n.roles.includes("admin") && !n.roles.includes("manager")).map(item => (
                 <NavLink key={item.to} to={item.to}
                   className={({ isActive }) =>
-                    `flex items-center gap-4 px-3.5 py-3 rounded-2xl transition-all group ${
-                      isActive
-                        ? "bg-indigo-50 text-indigo-600 shadow-sm"
-                        : "text-gray-400 hover:text-gray-900 hover:bg-gray-50"
+                    `flex items-center gap-4 px-3.5 py-3 rounded-2xl transition-all group ${isActive
+                      ? "bg-indigo-50 text-indigo-600 shadow-sm"
+                      : "text-gray-400 hover:text-gray-900 hover:bg-gray-50"
                     }`
                   }
                 >
@@ -327,11 +322,10 @@ export default function Layout() {
 
         {/* Footer Area (User & Activity) */}
         <div className="p-4 space-y-4 border-t border-border">
-          <div className={`flex items-center gap-3 bg-muted/50 p-2 rounded-2xl transition-all ${
-            expanded ? "px-3" : "justify-center"
-          }`}>
+          <div className={`flex items-center gap-3 bg-muted/50 p-2 rounded-2xl transition-all ${expanded ? "px-3" : "justify-center"
+            }`}>
             <NotifBell />
-            <button 
+            <button
               onClick={() => setDark(!dark)}
               className="h-9 w-9 flex items-center justify-center rounded-xl hover:bg-muted text-muted-foreground transition-colors"
             >
@@ -356,9 +350,8 @@ export default function Layout() {
             </div>
             <button
               onClick={() => { logout(); navigate("/login"); }}
-              className={`h-10 w-10 flex items-center justify-center rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 text-muted-foreground hover:text-red-500 transition-colors ${
-                expanded ? "opacity-100" : "opacity-0 hidden"
-              }`}
+              className={`h-10 w-10 flex items-center justify-center rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 text-muted-foreground hover:text-red-500 transition-colors ${expanded ? "opacity-100" : "opacity-0 hidden"
+                }`}
             >
               <LogOut size={18} />
             </button>

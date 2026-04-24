@@ -232,35 +232,35 @@ def tpl_approval_required(approver_name: str, requester: str, resource: str, whe
 
 
 def tpl_account_approved(user_name: str, link: str) -> tuple[str, str]:
-    subject = "Welcome to Spaceflow — Account Approved"
+    subject = "Welcome to clickAway — Account Approved"
     html = _wrap(
         "Your account is approved.",
         f"""Hi <strong>{user_name}</strong>,<br><br>
-        Great news! Your account registration for Spaceflow has been <strong style="color:#16A34A;">approved</strong>.
+        Great news! Your account registration for clickAway has been <strong style="color:#16A34A;">approved</strong>.
         You can now log in and start booking resources.""",
-        cta_label="Explore Spaceflow",
+        cta_label="Explore clickAway",
         cta_url=link,
     )
     return subject, html
 
 
 def tpl_account_rejected(user_name: str) -> tuple[str, str]:
-    subject = "Spaceflow — Account Rejected"
+    subject = "clickAway — Account Rejected"
     html = _wrap(
         "Your account registration was rejected.",
         f"""Hi <strong>{user_name}</strong>,<br><br>
-        We're sorry, but your recent account registration request for Spaceflow was <strong style="color:#DC2626;">rejected</strong> by the manager or administrator.
+        We're sorry, but your recent account registration request for clickAway was <strong style="color:#DC2626;">rejected</strong> by the manager or administrator.
         <br><br>Please contact your administrator if you believe this was a mistake.""",
     )
     return subject, html
 
 
 def tpl_account_deleted(user_name: str, reason: str) -> tuple[str, str]:
-    subject = "Spaceflow — Account Deleted"
+    subject = "clickAway — Account Deleted"
     html = _wrap(
         "Your account was deleted.",
         f"""Hi <strong>{user_name}</strong>,<br><br>
-        Your account on Spaceflow has been <strong style="color:#DC2626;">deleted</strong> by an administrator.<br><br>
+        Your account on clickAway has been <strong style="color:#DC2626;">deleted</strong> by an administrator.<br><br>
         <strong>Reason:</strong><br>
         <blockquote style="margin:12px 0;padding:10px 12px;border-left:3px solid {_BORDER};color:#334155;">{reason or 'No reason provided.'}</blockquote>
         <br>If you believe this was an error, please contact your IT department.""",
