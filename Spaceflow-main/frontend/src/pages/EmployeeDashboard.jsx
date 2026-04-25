@@ -5,10 +5,23 @@ import { useAuth } from "../context/AuthContext";
 import BookingStateBadge from "../components/BookingStateBadge";
 import { 
   Plus, ArrowRight, QrCode, CalendarDays, Clock, 
-  MapPin, Users, Zap, TrendingUp, Activity, CheckCircle, 
-  Loader2, Star, Search, Filter, Box, MessageSquare, X, Send
+  MapPin, Activity, CheckCircle, Loader2, Star,
+  Box, MessageSquare, X, Send, LayoutDashboard, Target,
+  ChevronRight, BarChart3, TrendingUp
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+
+const activityData = [
+  { name: 'Mon', bookings: 1 },
+  { name: 'Tue', bookings: 3 },
+  { name: 'Wed', bookings: 2 },
+  { name: 'Thu', bookings: 4 },
+  { name: 'Fri', bookings: 2 },
+  { name: 'Sat', bookings: 0 },
+  { name: 'Sun', bookings: 0 },
+];
 
 export default function EmployeeDashboard() {
   const { user } = useAuth();
@@ -51,7 +64,7 @@ export default function EmployeeDashboard() {
         booking_id: feedbackBooking.id,
         content: feedbackContent
       });
-      toast.success("Feedback submitted to management");
+      toast.success("Feedback Submitted", { description: "Thank you for your feedback." });
       setFeedbackBooking(null);
       setFeedbackContent("");
     } catch (err) {
@@ -61,199 +74,245 @@ export default function EmployeeDashboard() {
     }
   };
 
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.05 }
+    }
+  };
+
+  const item = {
+    hidden: { opacity: 0, y: 15 },
+    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+  };
+
   if (loading) return (
-    <div className="flex items-center justify-center h-64">
-      <Loader2 className="animate-spin w-8 h-8 text-indigo-600" />
+    <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
+      <Loader2 className="animate-spin w-8 h-8 text-[#0ea5e9]" />
+      <p className="text-sm font-semibold text-slate-500">Loading Dashboard...</p>
     </div>
   );
 
   return (
-    <div className="space-y-8 animate-fade-in-up">
-      
+    <motion.div 
+      variants={container}
+      initial="hidden"
+      animate="show"
+      className="max-w-6xl mx-auto space-y-8 pb-20"
+    >
       {/* ── Welcome Header ── */}
-      <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
-         <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
-            <Box size={200} />
-         </div>
-         <div className="relative z-10 text-center md:text-left">
-            <div className="text-xs font-bold text-indigo-600 uppercase tracking-[0.2em] mb-2">Spaceflow Portal</div>
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-2">Welcome back, {user?.name.split(" ")[0]}</h1>
-            <p className="text-slate-500 text-sm max-w-md leading-relaxed">
-               You have {upcoming.length} sessions scheduled for the upcoming interval. Your performance index is currently at <span className="font-bold text-slate-900">{reliabilityScore}%</span>.
-            </p>
-            <div className="flex flex-wrap items-center gap-3 mt-6 justify-center md:justify-start">
-               <Link to="/browse" className="sf-btn-primary py-2 px-5 text-xs h-auto">
-                  <Plus size={14} className="mr-2" /> New Reservation
-               </Link>
-               <Link to="/checkin" className="sf-btn-secondary py-2 px-5 text-xs h-auto bg-slate-50 border-none shadow-none">
-                  <QrCode size={14} className="mr-2" /> Express Check-in
-               </Link>
-            </div>
-         </div>
-         
-         <div className="flex items-center gap-12 bg-slate-50 px-8 py-6 rounded-2xl border border-slate-100 relative z-10">
-            <div className="text-center">
-               <div className="text-3xl font-bold text-slate-900">{reliabilityScore}%</div>
-               <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Reliability</div>
-            </div>
-            <div className="h-10 w-px bg-slate-200" />
-            <div className="text-center">
-               <div className="text-3xl font-bold text-slate-900">{completed.length}</div>
-               <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Sessions</div>
-            </div>
-         </div>
-      </div>
+      <motion.div 
+        variants={item}
+        className="bg-white rounded-3xl p-8 md:p-10 border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-8"
+      >
+        <div>
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight mb-3">
+            Welcome back, {user?.name.split(" ")[0]}
+          </h1>
+          <p className="text-slate-500 text-base font-medium">
+            You have <span className="text-slate-900 font-semibold">{upcoming.length} upcoming bookings</span> scheduled.
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-4">
+          <Link to="/browse" className="bg-[#0ea5e9] text-white px-6 py-3 rounded-xl text-sm font-semibold hover:bg-[#0284c7] transition-colors shadow-sm flex items-center gap-2">
+            <Plus size={18} /> New Booking
+          </Link>
+          <Link to="/checkin" className="bg-white text-slate-700 border border-slate-200 px-6 py-3 rounded-xl text-sm font-semibold hover:bg-slate-50 transition-colors flex items-center gap-2 shadow-sm">
+            <QrCode size={18} /> Quick Check-in
+          </Link>
+        </div>
+      </motion.div>
 
+      {/* ── Stats & Graph Grid ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        {/* Main Content: Upcoming & Completed */}
-        <div className="lg:col-span-2 space-y-12">
-           
-           {/* Upcoming Schedule */}
-           <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                 <h3 className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
-                    <CalendarDays size={14} /> Upcoming Operations
-                 </h3>
-                 <Link to="/bookings" className="text-[10px] font-bold text-indigo-600 hover:underline">Full Audit Log</Link>
-              </div>
-
-              {upcoming.length === 0 ? (
-                <div className="sf-card py-16 flex flex-col items-center justify-center text-center px-8 border-dashed border-2">
-                   <div className="font-bold text-slate-900">No Upcoming Sessions</div>
-                   <p className="text-slate-500 text-sm mt-1 max-w-xs">Your schedule is currently clear.</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {upcoming.slice(0, 3).map(b => (
-                    <Link key={b.id} to={`/bookings/${b.id}`} className="sf-card p-5 group flex items-center gap-6 transition-all hover:border-indigo-200">
-                       <div className="flex flex-col items-center justify-center h-14 w-14 bg-slate-50 rounded-xl border border-slate-100 group-hover:bg-indigo-50 group-hover:border-indigo-100 transition-colors">
-                          <div className="text-[10px] font-bold text-slate-400 group-hover:text-indigo-400 uppercase tracking-tighter">{new Date(b.start_time).toLocaleDateString(undefined, {month:'short'})}</div>
-                          <div className="text-xl font-bold text-slate-900 group-hover:text-indigo-600 leading-none mt-1">{new Date(b.start_time).getDate()}</div>
-                       </div>
-                       <div className="flex-1 min-w-0">
-                          <div className="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors truncate">{b.resource_name}</div>
-                          <div className="text-xs text-slate-500 flex items-center gap-1.5 mt-1">
-                             <Clock size={12} className="text-slate-300" /> 
-                             {new Date(b.start_time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} 
-                          </div>
-                       </div>
-                       <BookingStateBadge state={b.state} />
-                    </Link>
-                  ))}
-                </div>
-              )}
-           </div>
-
-           {/* Completed - Feedback Option */}
-           <div className="space-y-6">
-              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
-                 <CheckCircle size={14} className="text-emerald-500" /> Recently Completed
+        {/* Graph Card */}
+        <motion.div variants={item} className="lg:col-span-2 bg-white rounded-3xl p-8 border border-slate-200 shadow-sm flex flex-col">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <Activity size={20} className="text-[#0ea5e9]" /> Weekly Activity
               </h3>
-              <div className="space-y-4">
-                 {completed.slice(0, 3).map(b => (
-                   <div key={b.id} className="sf-card p-5 flex items-center justify-between group">
-                      <div className="flex items-center gap-4">
-                         <div className="h-10 w-10 bg-slate-50 rounded-lg flex items-center justify-center border border-slate-100">
-                            <Box size={18} className="text-slate-400" />
-                         </div>
-                         <div>
-                            <div className="font-bold text-slate-900">{b.resource_name}</div>
-                            <div className="text-xs text-slate-500">{new Date(b.end_time).toLocaleDateString(undefined, {month:'short', day:'numeric'})} · {new Date(b.end_time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
-                         </div>
+              <p className="text-sm text-slate-500 mt-1 font-medium">Your booking frequency over the last 7 days</p>
+            </div>
+          </div>
+          <div className="h-64 w-full mt-auto">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={activityData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorBookings" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#0ea5e9" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#0ea5e9" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b', fontWeight: 500 }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b', fontWeight: 500 }} />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  itemStyle={{ color: '#0f172a', fontWeight: 600 }}
+                  cursor={{ stroke: '#cbd5e1', strokeWidth: 1, strokeDasharray: '3 3' }}
+                />
+                <Area type="monotone" dataKey="bookings" stroke="#0ea5e9" strokeWidth={3} fillOpacity={1} fill="url(#colorBookings)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </motion.div>
+
+        {/* Stats Overview */}
+        <motion.div variants={item} className="space-y-8 flex flex-col">
+          <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm flex-1 flex flex-col justify-center">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="h-12 w-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100">
+                <Target size={24} />
+              </div>
+              <div>
+                <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Reliability Score</div>
+                <div className="text-3xl font-bold text-slate-900">{reliabilityScore}%</div>
+              </div>
+            </div>
+            <p className="text-sm text-slate-500 font-medium">You're in the top 10% of reliable users. Keep it up to maintain priority access.</p>
+          </div>
+
+          <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm flex-1 flex flex-col justify-center">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="h-12 w-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center border border-indigo-100">
+                <CheckCircle size={24} />
+              </div>
+              <div>
+                <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Completed</div>
+                <div className="text-3xl font-bold text-slate-900">{completed.length} Bookings</div>
+              </div>
+            </div>
+            <Link to="/bookings" className="text-sm font-semibold text-indigo-600 hover:text-indigo-700 flex items-center gap-1 mt-2 w-fit">
+              View history <ChevronRight size={16} />
+            </Link>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* ── Upcoming & Available Grid ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        {/* Upcoming */}
+        <motion.div variants={item} className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
+          <div className="flex items-center justify-between mb-8">
+            <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <CalendarDays size={20} className="text-[#0ea5e9]" /> Upcoming Bookings
+            </h3>
+            <Link to="/bookings" className="text-sm font-semibold text-[#0ea5e9] hover:text-[#0284c7]">View All</Link>
+          </div>
+
+          {upcoming.length === 0 ? (
+            <div className="text-center py-16 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+              <div className="text-slate-400 mb-3 flex justify-center"><CalendarDays size={32} /></div>
+              <p className="text-slate-600 font-semibold">No upcoming bookings</p>
+              <p className="text-slate-500 text-sm mt-1">Book a desk or meeting room to get started.</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {upcoming.slice(0, 4).map(b => (
+                <div key={b.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl border border-slate-100 hover:border-slate-200 hover:shadow-sm transition-all group bg-slate-50">
+                  <div className="flex items-center gap-5">
+                    <div className="bg-white h-14 w-14 rounded-xl border border-slate-200 flex flex-col items-center justify-center shrink-0 shadow-sm">
+                      <span className="text-xs font-bold text-slate-500 uppercase">{new Date(b.start_time).toLocaleDateString(undefined, {month:'short'})}</span>
+                      <span className="text-xl font-bold text-slate-900 leading-none">{new Date(b.start_time).getDate()}</span>
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-slate-900 text-base">{b.resource_name}</h4>
+                      <div className="text-sm text-slate-500 font-medium flex items-center gap-3 mt-1.5">
+                        <span className="flex items-center gap-1.5"><Clock size={14} className="text-slate-400" /> {new Date(b.start_time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+                        <span className="flex items-center gap-1.5"><MapPin size={14} className="text-slate-400" /> Floor {b.resource_floor || 'G'}</span>
                       </div>
-                      <button 
-                        onClick={() => setFeedbackBooking(b)}
-                        className="flex items-center gap-2 px-4 py-2 bg-slate-50 hover:bg-indigo-50 text-slate-600 hover:text-indigo-600 rounded-lg text-xs font-bold transition-all border border-transparent hover:border-indigo-100"
-                      >
-                         <MessageSquare size={14} /> Report Issue / Feedback
-                      </button>
-                   </div>
-                 ))}
-              </div>
-           </div>
-        </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col sm:items-end gap-3 pl-16 sm:pl-0">
+                    <BookingStateBadge state={b.state} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </motion.div>
 
-        {/* Right Sidebar: Quick Actions & Featured */}
-        <div className="space-y-8">
-           <div className="space-y-4">
-              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
-                 <Zap size={14} className="text-amber-500" /> Fast Inventory
-              </h3>
-              <div className="sf-card p-2">
-                 <div className="divide-y divide-slate-100">
-                    {resources.filter(r=>r.active).slice(0, 3).map(r => (
-                      <Link key={r.id} to={`/book/${r.id}`} className="p-3 flex items-center gap-3 group hover:bg-slate-50 rounded-lg transition-colors">
-                         <div className="h-10 w-10 bg-slate-100 rounded-lg overflow-hidden border border-slate-200">
-                            {r.image_url 
-                               ? <img src={getResourceImg(r)} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="" />
-                               : <div className="w-full h-full flex items-center justify-center text-xs opacity-20">🏢</div>
-                            }
-                         </div>
-                         <div className="flex-1 min-w-0">
-                            <div className="text-sm font-bold text-slate-900 truncate group-hover:text-indigo-600">{r.name}</div>
-                            <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest truncate">{r.type}</div>
-                         </div>
-                         <Plus size={14} className="text-slate-300 group-hover:text-indigo-600 transition-colors" />
-                      </Link>
-                    ))}
-                 </div>
-              </div>
-           </div>
+        {/* Available Resources */}
+        <motion.div variants={item} className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
+          <div className="flex items-center justify-between mb-8">
+            <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <Box size={20} className="text-[#0ea5e9]" /> Quick Book
+            </h3>
+            <Link to="/browse" className="text-sm font-semibold text-[#0ea5e9] hover:text-[#0284c7]">Browse All</Link>
+          </div>
 
-           <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-              <div className="h-10 w-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center mb-4">
-                 <Star size={20} />
-              </div>
-              <div className="text-sm font-bold text-slate-900 uppercase tracking-widest mb-2">Spaceflow Tip</div>
-              <p className="text-xs text-slate-500 leading-relaxed italic">
-                 "Check-in within 15 minutes of your session start time to maintain a high Reliability Index."
-              </p>
-           </div>
-        </div>
-
+          <div className="space-y-4">
+            {resources.filter(r=>r.active).slice(0, 4).map(r => (
+              <Link key={r.id} to={`/book/${r.id}`} className="flex items-center justify-between p-5 rounded-2xl border border-slate-100 hover:border-slate-200 hover:shadow-sm transition-all group bg-slate-50 cursor-pointer">
+                <div className="flex items-center gap-5">
+                  <div className="h-14 w-14 bg-white rounded-xl overflow-hidden shrink-0 border border-slate-200 shadow-sm">
+                    {r.image_url 
+                      ? <img src={getResourceImg(r)} className="w-full h-full object-cover" alt="" />
+                      : <div className="w-full h-full flex items-center justify-center text-2xl opacity-40">🏬</div>
+                    }
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-slate-900 text-base group-hover:text-[#0ea5e9] transition-colors">{r.name}</h4>
+                    <p className="text-sm text-slate-500 font-medium capitalize mt-1">{r.type}</p>
+                  </div>
+                </div>
+                <div className="h-10 w-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 group-hover:bg-[#0ea5e9] group-hover:text-white group-hover:border-[#0ea5e9] transition-colors shadow-sm">
+                  <Plus size={18} />
+                </div>
+              </Link>
+            ))}
+          </div>
+        </motion.div>
       </div>
 
       {/* ── Feedback Modal ── */}
-      {feedbackBooking && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-8">
-           <div className="sf-card w-full max-w-lg p-8 relative shadow-2xl animate-fade-in-up">
-              <button onClick={() => setFeedbackBooking(null)} className="absolute top-6 right-6 text-slate-400 hover:text-slate-900 transition-colors">
-                 <X size={20} />
-              </button>
-              
-              <div className="mb-8">
-                 <div className="sf-section-label mb-3">Resource Insight</div>
-                 <h2 className="text-2xl font-bold text-slate-900">Report an Issue</h2>
-                 <p className="text-slate-500 text-sm mt-1">Providing feedback for <span className="text-slate-900 font-semibold">{feedbackBooking.resource_name}</span> session.</p>
-              </div>
+      <AnimatePresence>
+        {feedbackBooking && (
+          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+             <motion.div 
+               initial={{ opacity: 0, scale: 0.95, y: 10 }}
+               animate={{ opacity: 1, scale: 1, y: 0 }}
+               exit={{ opacity: 0, scale: 0.95, y: 10 }}
+               className="bg-white border border-slate-200 w-full max-w-lg p-8 relative rounded-3xl shadow-xl"
+             >
+                <button onClick={() => setFeedbackBooking(null)} className="absolute top-6 right-6 text-slate-400 hover:text-slate-600 transition-colors bg-slate-50 p-2 rounded-full hover:bg-slate-100">
+                   <X size={20} />
+                </button>
+                
+                <div className="mb-8">
+                   <h2 className="text-2xl font-bold text-slate-900 mb-2">Share your experience</h2>
+                   <p className="text-slate-500 text-sm font-medium">How was your time at <span className="text-slate-900 font-bold">{feedbackBooking.resource_name}</span>?</p>
+                </div>
 
-              <form onSubmit={handleSubmitFeedback} className="space-y-6">
-                 <div className="space-y-2">
-                    <label className="sf-label">Detailed Observations</label>
-                    <textarea 
-                       required
-                       rows={4}
-                       className="sf-input py-4 resize-none"
-                       placeholder="e.g., Projector bulb flickering, room temperature was too high, or equipment missing..."
-                       value={feedbackContent}
-                       onChange={e => setFeedbackContent(e.target.value)}
-                    />
-                 </div>
+                <form onSubmit={handleSubmitFeedback} className="space-y-6">
+                   <div>
+                      <textarea 
+                         required
+                         rows={4}
+                         className="w-full bg-slate-50 border border-slate-200 focus:border-[#0ea5e9] focus:ring-2 focus:ring-[#0ea5e9]/20 rounded-2xl px-5 py-4 text-slate-900 placeholder:text-slate-400 outline-none transition-all font-medium resize-none"
+                         placeholder="Let us know how the workspace was..."
+                         value={feedbackContent}
+                         onChange={e => setFeedbackContent(e.target.value)}
+                      />
+                   </div>
 
-                 <div className="pt-6 border-t border-slate-100 flex gap-4">
-                    <button type="button" onClick={() => setFeedbackBooking(null)} className="sf-btn-secondary flex-1">
-                       Discard
-                    </button>
-                    <button type="submit" disabled={submittingFeedback} className="sf-btn-primary flex-[2]">
-                       {submittingFeedback ? <Loader2 size={18} className="animate-spin" /> : <><Send size={16} className="mr-2" /> Submit to Management</>}
-                    </button>
-                 </div>
-              </form>
-           </div>
-        </div>
-      )}
-
-    </div>
+                   <div className="flex gap-4">
+                      <button type="button" onClick={() => setFeedbackBooking(null)} className="px-6 py-3 bg-white text-slate-600 rounded-xl font-semibold text-sm hover:bg-slate-50 transition-colors border border-slate-200">
+                         Cancel
+                      </button>
+                      <button type="submit" disabled={submittingFeedback} className="flex-1 bg-[#0ea5e9] text-white rounded-xl font-semibold text-sm hover:bg-[#0284c7] transition-colors flex items-center justify-center gap-2 shadow-sm">
+                         {submittingFeedback ? <Loader2 size={18} className="animate-spin" /> : <><Send size={16} /> Submit Feedback</>}
+                      </button>
+                   </div>
+                </form>
+             </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }

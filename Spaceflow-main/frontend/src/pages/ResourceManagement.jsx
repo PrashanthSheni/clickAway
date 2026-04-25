@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { api, formatApiErrorDetail } from "../lib/api";
 import { toast } from "sonner";
-import { Plus, Pencil, Wrench, Trash2, X, Loader2, Upload, Image as ImageIcon } from "lucide-react";
+import { Plus, Pencil, Wrench, Trash2, X, Loader2, Upload, Image as ImageIcon, Box, Building2, Users, MapPin, Clock, Shield, Activity, ChevronRight, Ban, Send, Smartphone, AlertTriangle, Lock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { BACKEND_URL } from "../lib/api";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "../lib/utils";
 
 const EMPTY_RES = {
   name: "", type: "room", description: "", floor: 1, building: "HQ",
@@ -35,7 +37,7 @@ function ResourceDialog({ open, initial, onClose, onSaved }) {
         headers: { "Content-Type": "multipart/form-data" },
       });
       upd("image_url", data.url);
-      toast.success("Image uploaded");
+      toast.success("Image uploaded successfully");
     } catch (err) {
       toast.error("Failed to upload image");
     } finally {
@@ -52,7 +54,7 @@ function ResourceDialog({ open, initial, onClose, onSaved }) {
       } else {
         await api.post(`/resources`, payload);
       }
-      toast.success("Saved");
+      toast.success("Resource saved successfully");
       onSaved();
       onClose();
     } catch (e) {
@@ -66,124 +68,141 @@ function ResourceDialog({ open, initial, onClose, onSaved }) {
   const updPolicy = (k, v) => setForm((f) => ({ ...f, policy: { ...(f.policy || EMPTY_RES.policy), [k]: v } }));
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4" data-testid="resource-dialog">
-      <div className="bg-white rounded-lg border border-slate-200 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between px-5 py-3 border-b border-slate-200">
-          <div className="font-bold text-slate-900">{form.id ? "Edit resource" : "New resource"}</div>
-          <button onClick={onClose} data-testid="resource-dialog-close"><X size={16} /></button>
-        </div>
-        <div className="p-5 space-y-3">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="col-span-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">Name</label>
-              <input data-testid="res-form-name" value={form.name} onChange={(e) => upd("name", e.target.value)} className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm" />
+    <div className="fixed inset-0 z-[100] bg-[#1a1f2e]/60 backdrop-blur-xl flex items-center justify-center p-8">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.9, y: 20 }}
+        className="bg-[#fafaf9] rounded-[4rem] border-4 border-white w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl"
+      >
+        <div className="flex items-center justify-between px-12 py-10 border-b border-slate-50 relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-10 opacity-[0.02] text-[#1a1f2e] pointer-events-none font-bold text-6xl">
+             {form.id ? "EDIT" : "NEW"}
+          </div>
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+               <div className="h-2 w-2 rounded-full bg-[#00bbff]" />
+               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.4em]">Resource Details</span>
             </div>
-            <div>
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">Type</label>
-              <select data-testid="res-form-type" value={form.type} onChange={(e) => upd("type", e.target.value)} className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm bg-white">
-                <option value="room">Room</option>
-                <option value="desk">Desk</option>
-                <option value="parking">Parking</option>
+            <h2 className="text-4xl font-plus font-bold text-[#1a1f2e] tracking-tight">{form.id ? "Edit Resource" : "Add New Resource"}</h2>
+          </div>
+          <button onClick={onClose} className="h-12 w-12 bg-[#f5f5f4] rounded-2xl flex items-center justify-center text-slate-300 hover:text-[#1a1f2e] transition-all border border-slate-100 hover:border-slate-200"><X size={24} /></button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-12 custom-scrollbar space-y-12">
+          {/* Basic Info */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div className="md:col-span-2 space-y-4">
+              <label className="text-[11px] font-bold uppercase tracking-[0.4em] text-slate-300 ml-4">Resource Name</label>
+              <input value={form.name} onChange={(e) => upd("name", e.target.value)} className="w-full bg-[#f5f5f4] border border-slate-100 focus:border-[#00bbff]/40 focus:bg-[#fafaf9] rounded-[1.5rem] px-8 py-5 text-[#1a1f2e] font-bold outline-none transition-all shadow-inner" placeholder="E.g. Executive Boardroom" />
+            </div>
+            <div className="space-y-4">
+              <label className="text-[11px] font-bold uppercase tracking-[0.4em] text-slate-300 ml-4">Type</label>
+              <select value={form.type} onChange={(e) => upd("type", e.target.value)} className="w-full bg-[#f5f5f4] border border-slate-100 focus:border-[#00bbff]/40 focus:bg-[#fafaf9] rounded-[1.5rem] px-8 py-5 text-[#1a1f2e] font-bold outline-none transition-all shadow-inner appearance-none cursor-pointer">
+                <option value="room">Meeting Room</option>
+                <option value="desk">Workstation (Desk)</option>
+                <option value="parking">Parking Space</option>
                 <option value="equipment">Equipment</option>
               </select>
             </div>
-            <div>
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">Floor</label>
-              <input type="number" data-testid="res-form-floor" value={form.floor} onChange={(e) => upd("floor", parseInt(e.target.value))} className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm" />
+            <div className="space-y-4">
+              <label className="text-[11px] font-bold uppercase tracking-[0.4em] text-slate-300 ml-4">Capacity</label>
+              <input type="number" value={form.capacity} onChange={(e) => upd("capacity", parseInt(e.target.value))} className="w-full bg-[#f5f5f4] border border-slate-100 focus:border-[#00bbff]/40 focus:bg-[#fafaf9] rounded-[1.5rem] px-8 py-5 text-[#1a1f2e] font-bold outline-none transition-all shadow-inner" />
             </div>
-            <div>
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">Capacity</label>
-              <input type="number" data-testid="res-form-capacity" value={form.capacity} onChange={(e) => upd("capacity", parseInt(e.target.value))} className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm" />
-            </div>
-            <div>
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">Building</label>
-              <input data-testid="res-form-building" value={form.building} onChange={(e) => upd("building", e.target.value)} className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm" />
-            </div>
-            <div>
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">Avail. start</label>
-              <input type="time" data-testid="res-form-avail-start" value={form.availability_start} onChange={(e) => upd("availability_start", e.target.value)} className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm" />
-            </div>
-            <div>
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">Avail. end</label>
-              <input type="time" data-testid="res-form-avail-end" value={form.availability_end} onChange={(e) => upd("availability_end", e.target.value)} className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm" />
-            </div>
-            <div className="col-span-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">Description</label>
-              <textarea data-testid="res-form-desc" value={form.description} onChange={(e) => upd("description", e.target.value)} rows={2} className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm" />
-            </div>
-            <div className="col-span-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">Amenities (comma-separated)</label>
-              <input data-testid="res-form-amenities" value={Array.isArray(form.amenities) ? form.amenities.join(", ") : form.amenities} onChange={(e) => upd("amenities", e.target.value)} className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm" />
-            </div>
-
-            <div className="col-span-2 space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">Resource Image</label>
-              <div className="flex items-center gap-4">
-                <div className="w-24 h-24 rounded-lg bg-slate-100 border-2 border-dashed border-slate-300 flex items-center justify-center overflow-hidden">
-                  {form.image_url ? (
-                    <img 
-                      src={form.image_url.startsWith("http") ? form.image_url : `${BACKEND_URL}${form.image_url}`} 
-                      alt="Preview" 
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <ImageIcon size={24} className="text-slate-400" />
-                  )}
-                </div>
-                <div className="flex-1">
-                  <input 
-                    type="file" 
-                    id="resource-image-upload" 
-                    className="hidden" 
-                    accept="image/*"
-                    onChange={handleFileChange}
-                  />
-                  <label 
-                    htmlFor="resource-image-upload"
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 rounded-md text-sm font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer transition-colors"
-                  >
-                    {uploading ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
-                    {form.image_url ? "Change image" : "Upload image"}
-                  </label>
-                  <p className="text-[10px] text-slate-500 mt-1">PNG, JPG, or WEBP up to 5MB</p>
-                </div>
-              </div>
-            </div>
-            <label className="inline-flex items-center gap-2 text-sm">
-              <input type="checkbox" data-testid="res-form-req-approval" checked={form.requires_approval} onChange={(e) => upd("requires_approval", e.target.checked)} />
-              Requires approval
-            </label>
-            <label className="inline-flex items-center gap-2 text-sm">
-              <input type="checkbox" data-testid="res-form-active" checked={form.active} onChange={(e) => upd("active", e.target.checked)} />
-              Active
-            </label>
           </div>
 
-          <div className="pt-3 border-t border-slate-200">
-            <div className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Policy</div>
-            <div className="grid grid-cols-3 gap-3">
-              <div>
-                <label className="text-xs text-slate-500 block mb-1">Max duration (min)</label>
-                <input type="number" value={form.policy?.max_duration_minutes} onChange={(e) => updPolicy("max_duration_minutes", parseInt(e.target.value))} className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm" />
+          <div className="grid grid-cols-3 gap-10">
+            <div className="space-y-4">
+              <label className="text-[11px] font-bold uppercase tracking-[0.4em] text-slate-300 ml-4">Floor</label>
+              <input type="number" value={form.floor} onChange={(e) => upd("floor", parseInt(e.target.value))} className="w-full bg-[#f5f5f4] border border-slate-100 rounded-[1.5rem] px-8 py-5 text-[#1a1f2e] font-bold outline-none" />
+            </div>
+            <div className="space-y-4">
+               <label className="text-[11px] font-bold uppercase tracking-[0.4em] text-slate-300 ml-4">Available From</label>
+               <input type="time" value={form.availability_start} onChange={(e) => upd("availability_start", e.target.value)} className="w-full bg-[#f5f5f4] border border-slate-100 rounded-[1.5rem] px-8 py-5 text-[#1a1f2e] font-bold outline-none" />
+            </div>
+            <div className="space-y-4">
+               <label className="text-[11px] font-bold uppercase tracking-[0.4em] text-slate-300 ml-4">Available Until</label>
+               <input type="time" value={form.availability_end} onChange={(e) => upd("availability_end", e.target.value)} className="w-full bg-[#f5f5f4] border border-slate-100 rounded-[1.5rem] px-8 py-5 text-[#1a1f2e] font-bold outline-none" />
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <label className="text-[11px] font-bold uppercase tracking-[0.4em] text-slate-300 ml-4">Description</label>
+            <textarea value={form.description} onChange={(e) => upd("description", e.target.value)} rows={3} className="w-full bg-[#f5f5f4] border border-slate-100 focus:border-[#00bbff]/40 focus:bg-[#fafaf9] rounded-[2rem] px-10 py-8 text-[#1a1f2e] font-medium outline-none transition-all shadow-inner resize-none" placeholder="Add details about the space..." />
+          </div>
+
+          {/* Image */}
+          <div className="bg-[#f5f5f4] border border-slate-100 rounded-[3.5rem] p-10 space-y-8">
+            <label className="text-[11px] font-bold uppercase tracking-[0.4em] text-slate-300 ml-4">Resource Image</label>
+            <div className="flex items-center gap-10">
+              <div className="w-40 h-40 rounded-[2.5rem] bg-[#fafaf9] border-2 border-dashed border-slate-200 flex items-center justify-center overflow-hidden shadow-sm relative group/img">
+                {form.image_url ? (
+                  <img 
+                    src={form.image_url.startsWith("http") ? form.image_url : `${BACKEND_URL}${form.image_url}`} 
+                    alt="Preview" 
+                    className="w-full h-full object-cover transition-transform group-hover/img:scale-110"
+                  />
+                ) : (
+                  <ImageIcon size={40} className="text-slate-100" />
+                )}
+                {uploading && <div className="absolute inset-0 bg-[#fafaf9]/60 backdrop-blur-sm flex items-center justify-center"><Loader2 className="animate-spin text-[#00bbff]" /></div>}
               </div>
-              <div>
-                <label className="text-xs text-slate-500 block mb-1">Min advance (min)</label>
-                <input type="number" value={form.policy?.min_advance_minutes} onChange={(e) => updPolicy("min_advance_minutes", parseInt(e.target.value))} className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm" />
+              <div className="flex-1 space-y-4">
+                <input type="file" id="resource-image-upload" className="hidden" accept="image/*" onChange={handleFileChange} />
+                <label htmlFor="resource-image-upload" className="inline-flex items-center gap-4 px-10 py-5 bg-[#1a1f2e] text-white rounded-2xl text-[11px] font-bold uppercase tracking-widest hover:bg-[#00bbff] cursor-pointer transition-all shadow-xl active:scale-95">
+                  <Upload size={18} /> {form.image_url ? "Change Image" : "Upload Image"}
+                </label>
+                <p className="text-[10px] text-slate-300 uppercase tracking-widest font-bold ml-2">PNG, JPG or WEBP (Max 5MB)</p>
               </div>
-              <div>
-                <label className="text-xs text-slate-500 block mb-1">Max advance (days)</label>
-                <input type="number" value={form.policy?.max_advance_days} onChange={(e) => updPolicy("max_advance_days", parseInt(e.target.value))} className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm" />
+            </div>
+          </div>
+
+          {/* Policy */}
+          <div className="pt-8 border-t-2 border-slate-50 space-y-10">
+            <div className="flex items-center gap-4">
+               <Shield size={18} className="text-[#00bbff]" />
+               <h3 className="text-[12px] font-bold text-[#1a1f2e] uppercase tracking-[0.5em]">Booking Rules</h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="space-y-4">
+                <label className="text-[11px] font-bold uppercase tracking-[0.4em] text-slate-300 ml-4">Max Duration (min)</label>
+                <input type="number" value={form.policy?.max_duration_minutes} onChange={(e) => updPolicy("max_duration_minutes", parseInt(e.target.value))} className="w-full bg-[#fafaf9] border border-slate-200 rounded-2xl px-8 py-5 text-[#1a1f2e] font-bold outline-none" />
               </div>
+              <div className="space-y-4">
+                <label className="text-[11px] font-bold uppercase tracking-[0.4em] text-slate-300 ml-4">Min Notice (min)</label>
+                <input type="number" value={form.policy?.min_advance_minutes} onChange={(e) => updPolicy("min_advance_minutes", parseInt(e.target.value))} className="w-full bg-[#fafaf9] border border-slate-200 rounded-2xl px-8 py-5 text-[#1a1f2e] font-bold outline-none" />
+              </div>
+              <div className="space-y-4">
+                <label className="text-[11px] font-bold uppercase tracking-[0.4em] text-slate-300 ml-4">Future Booking Limit (days)</label>
+                <input type="number" value={form.policy?.max_advance_days} onChange={(e) => updPolicy("max_advance_days", parseInt(e.target.value))} className="w-full bg-[#fafaf9] border border-slate-200 rounded-2xl px-8 py-5 text-[#1a1f2e] font-bold outline-none" />
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-10 pt-4">
+               <label className="flex items-center gap-4 cursor-pointer group">
+                  <div className={cn("h-8 w-8 rounded-xl border-2 flex items-center justify-center transition-all", form.requires_approval ? "bg-[#00bbff] border-[#00bbff] text-white" : "border-slate-200 text-transparent")}>
+                     <X size={16} strokeWidth={4} />
+                  </div>
+                  <input type="checkbox" className="hidden" checked={form.requires_approval} onChange={(e) => upd("requires_approval", e.target.checked)} />
+                  <span className="text-[11px] font-bold uppercase tracking-widest text-slate-400 group-hover:text-[#1a1f2e] transition-colors">Requires Approval</span>
+               </label>
+               <label className="flex items-center gap-4 cursor-pointer group">
+                  <div className={cn("h-8 w-8 rounded-xl border-2 flex items-center justify-center transition-all", form.active ? "bg-emerald-500 border-emerald-500 text-white" : "border-slate-200 text-transparent")}>
+                     <X size={16} strokeWidth={4} />
+                  </div>
+                  <input type="checkbox" className="hidden" checked={form.active} onChange={(e) => upd("active", e.target.checked)} />
+                  <span className="text-[11px] font-bold uppercase tracking-widest text-slate-400 group-hover:text-[#1a1f2e] transition-colors">Is Active</span>
+               </label>
             </div>
           </div>
         </div>
-        <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-slate-200">
-          <button onClick={onClose} className="text-sm text-slate-600 px-3 py-2">Cancel</button>
-          <button data-testid="res-form-save" onClick={save} disabled={busy} className="bg-blue-600 text-white font-semibold rounded-md px-4 py-2 hover:bg-blue-700 inline-flex items-center gap-2 disabled:opacity-60">
-            {busy && <Loader2 size={14} className="animate-spin" />} Save
+
+        <div className="px-12 py-10 border-t border-slate-50 flex items-center justify-end gap-6 bg-[#f5f5f4]/30">
+          <button onClick={onClose} className="px-8 text-[11px] font-bold text-slate-400 hover:text-[#1a1f2e] uppercase tracking-widest transition-all">Cancel</button>
+          <button onClick={save} disabled={busy} className="bg-[#1a1f2e] text-white h-20 px-12 rounded-2xl font-bold text-xs uppercase tracking-[0.4em] hover:bg-[#00bbff] transition-all shadow-xl active:scale-95 flex items-center gap-4 disabled:opacity-20">
+            {busy ? <Loader2 size={24} className="animate-spin" /> : <><Send size={20} /> Save Resource</>}
           </button>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
@@ -206,7 +225,7 @@ function MaintenanceDialog({ open, resource, onClose, onSaved }) {
       });
       setPreview(data);
     } catch (e) {
-      toast.error(formatApiErrorDetail(e.response?.data?.detail) || e.message);
+      toast.error("Failed to check for conflicts");
     } finally {
       setBusy(false);
     }
@@ -221,52 +240,89 @@ function MaintenanceDialog({ open, resource, onClose, onSaved }) {
         end_time: new Date(form.end_time).toISOString(),
         reason: form.reason,
       });
-      toast.success("Maintenance scheduled. Affected bookings cancelled.");
+      toast.success("Maintenance schedule saved");
       onSaved();
       onClose();
     } catch (e) {
-      toast.error(formatApiErrorDetail(e.response?.data?.detail) || e.message);
+      toast.error("Failed to set offline");
     } finally {
       setBusy(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4" data-testid="maintenance-dialog">
-      <div className="bg-white rounded-lg border border-slate-200 w-full max-w-xl">
-        <div className="flex items-center justify-between px-5 py-3 border-b border-slate-200">
-          <div className="font-bold text-slate-900">Schedule maintenance · {resource.name}</div>
-          <button onClick={onClose}><X size={16} /></button>
+    <div className="fixed inset-0 z-[100] bg-[#1a1f2e]/60 backdrop-blur-xl flex items-center justify-center p-8">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.9, y: 20 }}
+        className="bg-[#fafaf9] rounded-[4rem] border-4 border-white w-full max-w-2xl p-12 xl:p-16 relative shadow-2xl overflow-hidden"
+      >
+        <div className="absolute top-0 right-0 p-16 opacity-[0.03] text-red-500 pointer-events-none rotate-12">
+           <Wrench size={200} />
         </div>
-        <div className="p-5 space-y-3">
-          <div className="grid grid-cols-2 gap-3">
-            <input type="datetime-local" data-testid="maint-start" value={form.start_time} onChange={(e) => setForm({ ...form, start_time: e.target.value })} className="border border-slate-300 rounded-md px-3 py-2 text-sm" />
-            <input type="datetime-local" data-testid="maint-end" value={form.end_time} onChange={(e) => setForm({ ...form, end_time: e.target.value })} className="border border-slate-300 rounded-md px-3 py-2 text-sm" />
-          </div>
-          <input data-testid="maint-reason" placeholder="Reason (AC repair, upgrade, etc.)" value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm" />
-          <button data-testid="maint-preview-btn" onClick={doPreview} disabled={busy || !form.start_time || !form.end_time} className="bg-white border border-slate-300 text-slate-900 font-semibold rounded-md px-4 py-2 hover:bg-slate-50 inline-flex items-center gap-2 disabled:opacity-60">
-            Preview impact
-          </button>
-          {preview && (
-            <div className="mt-2 p-3 border border-amber-200 bg-amber-50 rounded-md text-sm">
-              <div className="font-semibold text-amber-900">{preview.affected_bookings.length} affected bookings</div>
-              <ul className="mt-1 space-y-1">
-                {preview.affected_bookings.slice(0, 8).map((b) => (
-                  <li key={b.id} className="text-xs text-amber-800">
-                    • {b.user_name} · {new Date(b.start_time).toLocaleString()}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+        
+        <button onClick={onClose} className="absolute top-12 right-12 h-12 w-12 bg-[#f5f5f4] rounded-2xl flex items-center justify-center text-slate-300 hover:text-[#1a1f2e] transition-all border border-slate-100 hover:border-slate-200">
+           <X size={24} />
+        </button>
+
+        <div className="mb-12 text-center relative z-10">
+           <div className="inline-flex items-center gap-4 px-6 py-2 bg-red-50 border border-red-100 rounded-full text-[10px] font-bold uppercase tracking-widest text-red-500 mb-8 shadow-sm">Maintenance Schedule</div>
+           <h2 className="text-4xl font-plus font-bold text-[#1a1f2e] tracking-tight">Set Offline: {resource.name}</h2>
         </div>
-        <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-slate-200">
-          <button onClick={onClose} className="text-sm text-slate-600 px-3 py-2">Cancel</button>
-          <button data-testid="maint-apply-btn" onClick={apply} disabled={busy || !preview} className="bg-red-600 text-white font-semibold rounded-md px-4 py-2 hover:bg-red-700 inline-flex items-center gap-2 disabled:opacity-60">
-            {busy && <Loader2 size={14} className="animate-spin" />} Apply & cancel bookings
-          </button>
+
+        <div className="space-y-10 relative z-10">
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-4">
+                 <label className="text-[11px] font-bold uppercase tracking-[0.4em] text-slate-300 ml-4">Start Date/Time</label>
+                 <input type="datetime-local" value={form.start_time} onChange={(e) => setForm({ ...form, start_time: e.target.value })} className="w-full bg-[#f5f5f4] border border-slate-100 rounded-2xl px-8 py-5 text-[#1a1f2e] font-bold outline-none" />
+              </div>
+              <div className="space-y-4">
+                 <label className="text-[11px] font-bold uppercase tracking-[0.4em] text-slate-300 ml-4">End Date/Time</label>
+                 <input type="datetime-local" value={form.end_time} onChange={(e) => setForm({ ...form, end_time: e.target.value })} className="w-full bg-[#f5f5f4] border border-slate-100 rounded-2xl px-8 py-5 text-[#1a1f2e] font-bold outline-none" />
+              </div>
+           </div>
+           <div className="space-y-4">
+              <label className="text-[11px] font-bold uppercase tracking-[0.4em] text-slate-300 ml-4">Reason for Maintenance</label>
+              <textarea rows={2} value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} className="w-full bg-[#f5f5f4] border border-slate-100 focus:bg-[#fafaf9] rounded-[1.5rem] px-8 py-6 text-[#1a1f2e] font-medium outline-none transition-all resize-none shadow-inner" placeholder="e.g. Regular maintenance, repairs..." />
+           </div>
+
+           <button onClick={doPreview} disabled={busy || !form.start_time || !form.end_time} className="w-full h-16 bg-[#fafaf9] border-2 border-slate-100 text-slate-400 hover:text-[#1a1f2e] hover:border-slate-400 rounded-2xl text-[11px] font-bold uppercase tracking-widest transition-all shadow-sm active:scale-95 flex items-center justify-center gap-3">
+              <Activity size={18} /> Check for Conflicts
+           </button>
+
+           <AnimatePresence>
+             {preview && (
+               <motion.div 
+                 initial={{ opacity: 0, height: 0 }}
+                 animate={{ opacity: 1, height: 'auto' }}
+                 className="p-8 bg-amber-50 border border-amber-100 rounded-[2.5rem] space-y-6"
+               >
+                  <div className="flex items-center gap-4">
+                     <AlertTriangle size={20} className="text-amber-500" />
+                     <div className="text-amber-900 font-bold text-sm uppercase tracking-widest">{preview.affected_bookings.length} Booking Conflicts Found</div>
+                  </div>
+                  <div className="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto custom-scrollbar pr-4">
+                    {preview.affected_bookings.slice(0, 10).map((b) => (
+                      <div key={b.id} className="text-[11px] text-amber-700 font-bold py-2 border-b border-amber-200/50 flex items-center justify-between">
+                        <span>{b.user_name}</span>
+                        <span className="italic">{new Date(b.start_time).toLocaleString()}</span>
+                      </div>
+                    ))}
+                    {preview.affected_bookings.length > 10 && <div className="text-[9px] text-amber-400 uppercase font-bold text-center pt-2">+ {preview.affected_bookings.length - 10} additional bookings</div>}
+                  </div>
+               </motion.div>
+             )}
+           </AnimatePresence>
+
+           <div className="flex gap-6 pt-6">
+              <button onClick={onClose} className="px-10 text-[11px] font-bold text-slate-400 hover:text-[#1a1f2e] uppercase tracking-widest transition-all">Cancel</button>
+              <button onClick={apply} disabled={busy || !preview} className="flex-1 bg-red-500 text-white h-20 rounded-2xl font-bold text-xs uppercase tracking-[0.4em] hover:bg-red-600 transition-all shadow-xl active:scale-95 flex items-center justify-center gap-4 disabled:opacity-20">
+                 {busy ? <Loader2 size={24} className="animate-spin" /> : <><Ban size={22} /> Confirm Maintenance</>}
+              </button>
+           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
@@ -278,94 +334,144 @@ export default function ResourceManagement() {
   const [maintenanceFor, setMaintenanceFor] = useState(null);
 
   const load = async () => {
-    const { data } = await api.get("/resources");
-    setResources(data);
+    try {
+      const { data } = await api.get("/resources");
+      setResources(data);
+    } catch (_) {}
   };
   useEffect(() => {
     load();
   }, []);
 
   const del = async (id) => {
-    if (!window.confirm("Deactivate this resource?")) return;
-    await api.delete(`/resources/${id}`);
-    toast.success("Deactivated");
-    load();
+    if (!window.confirm("Are you sure you want to delete this resource permanently?")) return;
+    try {
+       await api.delete(`/resources/${id}`);
+       toast.success("Resource deleted");
+       load();
+    } catch (_) { toast.error("Failed to delete resource"); }
   };
 
   return (
-    <div data-testid="resource-mgmt-page" className="space-y-6">
-      <div className="flex items-end justify-between">
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="space-y-16 pb-20"
+    >
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-10 pb-10 border-b-2 border-slate-100">
         <div>
-          <div className="text-[10px] uppercase tracking-[0.3em] font-bold text-blue-600 mb-1">Admin</div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">Resource management</h1>
+          <div className="flex items-center gap-4 mb-4">
+             <div className="h-2 w-2 rounded-full bg-[#00bbff]" />
+             <span className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.4em]">Resource Management</span>
+          </div>
+          <h1 className="text-6xl font-plus font-bold text-[#1a1f2e] tracking-tight">All Resources.</h1>
+          <p className="text-slate-400 text-xl font-medium mt-6 leading-relaxed">Manage meeting rooms, desks, and equipment across your enterprise.</p>
         </div>
         <button
-          data-testid="res-create-btn"
           onClick={() => { setEditing(null); setDialogOpen(true); }}
-          className="bg-blue-600 text-white font-semibold rounded-md px-4 py-2 hover:bg-blue-700 inline-flex items-center gap-2"
+          className="bg-[#1a1f2e] text-white h-20 px-12 rounded-[2rem] font-bold text-xs uppercase tracking-[0.4em] hover:bg-[#00bbff] transition-all shadow-2xl hover:shadow-[#00bbff]/30 flex items-center gap-4 active:scale-95"
         >
-          <Plus size={16} /> New resource
+          <Plus size={24} strokeWidth={3} /> Add New Resource
         </button>
-      </div>
+      </header>
 
-      <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
-        <table className="w-full text-left text-sm">
-          <thead>
-            <tr className="bg-slate-50 border-b border-slate-200">
-              <th className="px-4 py-3 text-[10px] uppercase tracking-wider text-slate-500 font-bold">Name</th>
-              <th className="px-4 py-3 text-[10px] uppercase tracking-wider text-slate-500 font-bold">Type</th>
-              <th className="px-4 py-3 text-[10px] uppercase tracking-wider text-slate-500 font-bold">Floor</th>
-              <th className="px-4 py-3 text-[10px] uppercase tracking-wider text-slate-500 font-bold">Capacity</th>
-              <th className="px-4 py-3 text-[10px] uppercase tracking-wider text-slate-500 font-bold">Policy</th>
-              <th className="px-4 py-3 text-[10px] uppercase tracking-wider text-slate-500 font-bold">Status</th>
-              <th className="px-4 py-3" />
-            </tr>
-          </thead>
-          <tbody>
-            {resources.map((r) => (
-              <tr key={r.id} className="border-b border-slate-100 hover:bg-slate-50" data-testid={`res-row-${r.id}`}>
-                <td className="px-4 py-3 font-semibold text-slate-900">
-                  <Link to={`/resource/${r.id}/calendar`} className="hover:text-blue-700">{r.name}</Link>
-                </td>
-                <td className="px-4 py-3 uppercase text-xs tracking-wider text-slate-500 font-bold">{r.type}</td>
-                <td className="px-4 py-3 text-slate-600">F{r.floor}</td>
-                <td className="px-4 py-3 text-slate-600">{r.capacity}</td>
-                <td className="px-4 py-3 text-xs text-slate-500">
-                  {r.policy ? `${r.policy.max_duration_minutes}m max · ${r.policy.max_advance_days}d ahead` : "—"}
-                </td>
-                <td className="px-4 py-3">
-                  {r.active ? (
-                    <span className="px-2 py-0.5 rounded-full text-[10px] uppercase font-bold tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">Active</span>
-                  ) : (
-                    <span className="px-2 py-0.5 rounded-full text-[10px] uppercase font-bold tracking-wider bg-slate-100 text-slate-500 border border-slate-200">Off</span>
-                  )}
-                  {r.requires_approval && (
-                    <span className="ml-2 px-2 py-0.5 rounded-full text-[10px] uppercase font-bold tracking-wider bg-amber-50 text-amber-700 border border-amber-200">Approval</span>
-                  )}
-                </td>
-                <td className="px-4 py-3 text-right flex gap-1 justify-end">
-                  <button data-testid={`res-edit-${r.id}`} onClick={() => { setEditing(r); setDialogOpen(true); }} className="text-slate-600 hover:text-blue-700 p-1.5"><Pencil size={14} /></button>
-                  <button data-testid={`res-maint-${r.id}`} onClick={() => setMaintenanceFor(r)} className="text-slate-600 hover:text-amber-700 p-1.5"><Wrench size={14} /></button>
-                  <button data-testid={`res-del-${r.id}`} onClick={() => del(r.id)} className="text-slate-600 hover:text-red-700 p-1.5"><Trash2 size={14} /></button>
-                </td>
+      <div className="bg-[#fafaf9] rounded-[4rem] border border-slate-200 shadow-sm overflow-hidden group">
+        <div className="overflow-x-auto no-scrollbar">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-[#f5f5f4]/50 border-b border-slate-100 text-[11px] uppercase tracking-widest text-slate-400 font-bold">
+                <th className="px-10 py-8">Resource Name</th>
+                <th className="px-10 py-8">Type</th>
+                <th className="px-10 py-8">Location</th>
+                <th className="px-10 py-8">Capacity</th>
+                <th className="px-10 py-8">Booking Policy</th>
+                <th className="px-10 py-8">Status</th>
+                <th className="px-10 py-8 text-right">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {resources.map((r) => (
+                <tr key={r.id} className="group/row hover:bg-[#f5f5f4] transition-colors">
+                  <td className="px-10 py-8">
+                    <Link to={`/resource/${r.id}/calendar`} className="flex items-center gap-6 group/link">
+                       <div className="h-16 w-16 rounded-[1.5rem] bg-[#f5f5f4] border border-slate-100 flex items-center justify-center overflow-hidden shadow-inner group-hover/link:border-[#00bbff] transition-all">
+                          {r.image_url ? (
+                             <img src={r.image_url.startsWith("http") ? r.image_url : `${BACKEND_URL}${r.image_url}`} alt="Icon" className="w-full h-full object-cover group-hover/link:scale-110 transition-transform" />
+                          ) : (
+                             <Building2 size={24} className="text-slate-100" />
+                          )}
+                       </div>
+                       <div className="font-bold text-xl text-[#1a1f2e] group-hover/link:text-[#00bbff] transition-colors tracking-tight">{r.name}</div>
+                    </Link>
+                  </td>
+                  <td className="px-10 py-8 uppercase text-[11px] font-bold tracking-[0.2em] text-slate-400">{r.type}</td>
+                  <td className="px-10 py-8 text-[13px] font-bold text-slate-600">Floor {r.floor} · {r.building}</td>
+                  <td className="px-10 py-8">
+                     <div className="flex items-center gap-3 text-[#1a1f2e]">
+                        <Users size={16} className="text-[#00bbff]" />
+                        <span className="font-bold text-lg">{r.capacity}</span>
+                     </div>
+                  </td>
+                  <td className="px-10 py-8">
+                    {r.policy ? (
+                       <div className="space-y-1">
+                          <div className="text-[11px] font-bold text-[#1a1f2e] uppercase tracking-widest">{r.policy.max_duration_minutes}m Limit</div>
+                          <div className="text-[10px] font-medium text-slate-400 italic">Horizon: {r.policy.max_advance_days}d</div>
+                       </div>
+                    ) : (
+                       <span className="text-slate-100">—</span>
+                    )}
+                  </td>
+                  <td className="px-10 py-8">
+                    <div className="flex flex-wrap gap-3">
+                      {r.active ? (
+                        <span className="px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm">Active</span>
+                      ) : (
+                        <span className="px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest bg-slate-100 text-slate-400 border border-slate-200 shadow-sm">Offline</span>
+                      )}
+                      {r.requires_approval && (
+                        <span className="px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest bg-[#00bbff]/10 text-[#00bbff] border border-[#00bbff]/20 shadow-sm">Needs Approval</span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-10 py-8 text-right">
+                    <div className="flex items-center justify-end gap-3 opacity-0 group-hover/row:opacity-100 transition-all">
+                      <button onClick={() => { setEditing(r); setDialogOpen(true); }} className="h-12 w-12 bg-[#fafaf9] border border-slate-100 rounded-xl text-slate-300 hover:text-[#00bbff] hover:border-[#00bbff] transition-all shadow-sm active:scale-95 flex items-center justify-center">
+                        <Pencil size={18} />
+                      </button>
+                      <button onClick={() => setMaintenanceFor(r)} className="h-12 w-12 bg-[#fafaf9] border border-slate-100 rounded-xl text-slate-300 hover:text-amber-500 hover:border-amber-200 transition-all shadow-sm active:scale-95 flex items-center justify-center">
+                        <Wrench size={18} />
+                      </button>
+                      <button onClick={() => del(r.id)} className="h-12 w-12 bg-[#fafaf9] border border-slate-100 rounded-xl text-slate-200 hover:text-red-500 hover:border-red-200 transition-all shadow-sm active:scale-95 flex items-center justify-center">
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <ResourceDialog
-        open={dialogOpen}
-        initial={editing}
-        onClose={() => setDialogOpen(false)}
-        onSaved={load}
-      />
-      <MaintenanceDialog
-        open={!!maintenanceFor}
-        resource={maintenanceFor}
-        onClose={() => setMaintenanceFor(null)}
-        onSaved={load}
-      />
-    </div>
+      <AnimatePresence>
+        {dialogOpen && (
+          <ResourceDialog
+            open={dialogOpen}
+            initial={editing}
+            onClose={() => setDialogOpen(false)}
+            onSaved={load}
+          />
+        )}
+        {maintenanceFor && (
+          <MaintenanceDialog
+            open={!!maintenanceFor}
+            resource={maintenanceFor}
+            onClose={() => setMaintenanceFor(null)}
+            onSaved={load}
+          />
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }

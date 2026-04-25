@@ -7,7 +7,10 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "./components/Layout";
 
 import Home from "./pages/Home";
+import Solutions from "./pages/Solutions";
+import Pricing from "./pages/Pricing";
 import Auth from "./pages/Auth";
+import FeatureRequest from "./pages/FeatureRequest";
 import EmployeeDashboard from "./pages/EmployeeDashboard";
 import BrowseResources from "./pages/BrowseResources";
 import BookingForm from "./pages/BookingForm";
@@ -44,6 +47,9 @@ function App() {
           <Toaster position="top-right" richColors />
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/about" element={<Navigate to="/solutions" replace />} />
+            <Route path="/solutions" element={<Solutions />} />
+            <Route path="/pricing" element={<Pricing />} />
             <Route path="/auth" element={<Auth />} />
             <Route
               element={
@@ -53,6 +59,7 @@ function App() {
               }
             >
               <Route path="dashboard" element={<HomeRedirect />} />
+              <Route path="feature-request" element={<FeatureRequest />} />
               <Route path="browse" element={<BrowseResources />} />
               <Route path="book/:resourceId" element={<BookingForm />} />
               <Route path="bookings" element={<MyBookings />} />
