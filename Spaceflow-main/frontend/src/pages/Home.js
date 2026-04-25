@@ -1,21 +1,13 @@
 import React, { useRef, useEffect, useState } from "react";
-
 import { Link, useNavigate } from "react-router-dom";
-
 import { Calendar, Users, Shield, Zap, ArrowRight, Play } from "lucide-react";
 
 export default function Home() {
-
   const demoVideoRef = useRef(null);
-
   const productVideoRef = useRef(null);
-
   const productSectionRef = useRef(null);
-
   const [scrolled, setScrolled] = useState(false);
-
   const [productPlaying, setProductPlaying] = useState(false);
-
   const [ctaVisible, setCtaVisible] = useState(false);
 
   const ctaRef = useRef(null);
@@ -168,7 +160,7 @@ export default function Home() {
 
       }}>
         <div style={{ width: "50%", padding: "28px 48px", display: "flex", alignItems: "center", gap: "12px" }}>
-          <img src="/videos/logo3.png" alt="Spaceflow Logo" style={{ height: "32px", width: "auto", display: "block" }} />
+          <img src="/videos/logo2.jpeg" alt="Spaceflow Logo" style={{ height: "32px", width: "auto", display: "block" }} />
         </div>
         <div style={{ width: "50%", padding: "28px 48px", display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "40px" }}>
 
@@ -600,7 +592,7 @@ export default function Home() {
       {/* ── Footer ── */}
       <footer style={{ borderTop: "1px solid rgba(255,255,255,0.08)", padding: "36px 48px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <img src="/videos/logo3.png" alt="Spaceflow Logo" style={{ height: "24px", width: "auto", display: "block" }} />
+          <img src="/videos/logo2.jpeg" alt="Spaceflow Logo" style={{ height: "24px", width: "auto", display: "block" }} />
         </div>
         <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.18)", letterSpacing: "0.05em" }}>© {new Date().getFullYear()} clickAway. All rights reserved.</p>
         <div style={{ display: "flex", gap: "32px" }}>

@@ -44,7 +44,8 @@ async def _list_enriched(db: AsyncSession, bookings: List[Booking]) -> List[dict
 @router.post("/validate", response_model=ValidateOut)
 async def validate(body: BookingIn, db: AsyncSession = Depends(get_db), user: User = Depends(get_current_user)):
     errors, warnings, suggestions, requires_approval, auto_approve = await validate_booking(
-        db, user, body.resource_id, body.start_time, body.end_time, body.capacity_requested
+        db, user, body.resource_id, body.start_time, body.end_time, body.capacity_requested,
+        title=body.title
     )
     return ValidateOut(
         ok=len(errors) == 0, errors=errors, warnings=warnings,
@@ -56,7 +57,8 @@ async def validate(body: BookingIn, db: AsyncSession = Depends(get_db), user: Us
 @router.post("", response_model=BookingOut)
 async def create_booking(body: BookingIn, db: AsyncSession = Depends(get_db), user: User = Depends(get_current_user)):
     errors, warnings, suggestions, requires_approval, auto_approve = await validate_booking(
-        db, user, body.resource_id, body.start_time, body.end_time, body.capacity_requested
+        db, user, body.resource_id, body.start_time, body.end_time, body.capacity_requested,
+        title=body.title
     )
     if errors:
         raise HTTPException(status_code=400, detail={"message": "Validation failed", "errors": [e.model_dump() for e in errors]})
@@ -554,6 +556,7 @@ async def create_recurring(
 
         errors, _warnings, _sugg, requires_approval, auto_approve = await validate_booking(
             db, user, body.resource_id, cur_start, cur_end, body.capacity_requested,
+            title=body.title
         )
         if errors:
             failed.append({

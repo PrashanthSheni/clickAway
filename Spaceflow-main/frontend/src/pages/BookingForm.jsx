@@ -123,7 +123,7 @@ export default function BookingForm() {
     return <div className="text-slate-500">Loading…</div>;
   }
 
-  const canSubmit = validation && validation.ok && !submitting;
+  const canSubmit = form.title.trim().length >= 3 && validation && validation.ok && !submitting;
 
   return (
     <div data-testid="booking-form-page" className="space-y-6">
@@ -157,7 +157,9 @@ export default function BookingForm() {
           </div>
 
           <div>
-            <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">Title</label>
+            <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">
+              Title <span className="text-red-500">*</span>
+            </label>
             <input
               data-testid="booking-title-input"
               value={form.title}

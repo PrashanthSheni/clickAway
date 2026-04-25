@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "../context/AuthContext";
+import { Loader2, ArrowLeft } from "lucide-react";
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -77,206 +78,213 @@ export default function Auth() {
       setStep(1);
     } catch (err) {
       toast.error(err.message);
-      if (err.message.includes("No manager found")) {
-        // Option to go back and fix manager details
-        setStep(1);
-      }
+      if (err.message.includes("No manager found")) setStep(1);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-slate-900 tracking-tight">
-          {isLogin ? "Sign in to clickAway" : "Create an account"}
-        </h2>
+    <div className="min-h-screen flex bg-[#09090B] text-white overflow-hidden">
+      {/* ── Left Hero Panel ── */}
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
+        <img 
+          src="/videos/background.png" 
+          alt="Modern workspace" 
+          className="absolute inset-0 w-100 h-100 object-cover grayscale brightness-[0.4] contrast-[1.1]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent to-[#09090B] opacity-100" />
+        
+        <div className="relative z-10 flex flex-col justify-between p-16 w-100">
+          <Link to="/" className="flex items-center gap-3">
+            <img src="/videos/logo2.png" alt="Logo" className="h-10 w-auto" />
+            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 mt-1">Enterprise</span>
+          </Link>
+
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-white/40 mb-6">Spaceflow Identity</p>
+            <h1 className="font-serif text-6xl font-light tracking-tight leading-[1.1] mb-8">
+              Experience the<br />
+              <em className="italic text-white/30">Intelligence.</em>
+            </h1>
+            <p className="text-sm text-white/30 leading-relaxed max-w-sm">
+              Enter our secure ecosystem for modern workforce orchestration and intelligent space management.
+            </p>
+          </div>
+
+          <div className="flex gap-12 pt-12 border-t border-white/5">
+            {[["97%", "Check-in Rate"], ["3.2×", "Efficiency"], ["0", "Conflicts"]].map(([val, label]) => (
+              <div key={label}>
+                <div className="text-2xl font-light font-serif mb-1">{val}</div>
+                <div className="text-[9px] font-black uppercase tracking-[0.2em] text-white/20">{label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-slate-200">
+      {/* ── Right Form Panel ── */}
+      <div className="flex-1 flex flex-col justify-center px-8 lg:px-24 py-16 relative">
+        <div className="max-w-md w-full mx-auto">
+          {/* Back button */}
+          <Link to="/" className="absolute top-12 left-8 lg:left-24 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white/20 hover:text-white transition-colors group">
+            <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+            Return
+          </Link>
 
-          {isLogin ? (
-            <form onSubmit={handleLoginSubmit} className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-slate-700">Email address</label>
-                <div className="mt-1">
+          {/* Heading */}
+          <div className="mb-12">
+            <h2 className="font-serif text-4xl font-light tracking-tight mb-3">
+              {isLogin ? "Welcome Back" : "Join the Platform"}
+            </h2>
+            <p className="text-sm text-white/40">
+              {isLogin 
+                ? "Enter your credentials to access your dashboard." 
+                : "Initialize your enterprise account to begin."}
+            </p>
+          </div>
+
+          {/* Core Form Area */}
+          <div className="space-y-8">
+            {isLogin ? (
+              <form onSubmit={handleLoginSubmit} className="space-y-5">
+                <div className="space-y-1.5">
+                  <label className="sf-label">Email Address</label>
                   <input
                     type="email"
                     required
                     value={formData.email}
                     onChange={e => setFormData({ ...formData, email: e.target.value })}
-                    className="appearance-none block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="sf-input"
+                    placeholder="name@company.com"
                   />
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700">Password</label>
-                <div className="mt-1">
+                <div className="space-y-1.5">
+                  <label className="sf-label">Password</label>
                   <input
                     type="password"
                     required
                     value={formData.password}
                     onChange={e => setFormData({ ...formData, password: e.target.value })}
-                    className="appearance-none block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="sf-input"
+                    placeholder="••••••••"
                   />
                 </div>
-              </div>
-
-              <div>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-                >
-                  {loading ? "Signing in..." : "Sign in"}
+                <button type="submit" disabled={loading} className="sf-btn-primary w-full mt-4 h-12">
+                  {loading ? <Loader2 className="animate-spin" size={16} /> : "Sign In"}
                 </button>
-              </div>
-            </form>
-          ) : (
-            <>
-              {step === 1 ? (
-                <form onSubmit={handleRegisterStep1} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700">Name</label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.name}
-                      onChange={e => setFormData({ ...formData, name: e.target.value })}
-                      className="mt-1 appearance-none block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700">Email</label>
-                    <input
-                      type="email"
-                      required
-                      value={formData.email}
-                      onChange={e => setFormData({ ...formData, email: e.target.value })}
-                      className="mt-1 appearance-none block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700">Password</label>
-                    <input
-                      type="password"
-                      required
-                      value={formData.password}
-                      onChange={e => setFormData({ ...formData, password: e.target.value })}
-                      className="mt-1 appearance-none block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700">Role</label>
-                    <select
-                      value={formData.role}
-                      onChange={e => setFormData({ ...formData, role: e.target.value })}
-                      className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-slate-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-                    >
-                      <option value="employee">Employee</option>
-                      <option value="manager">Manager</option>
-                    </select>
-                  </div>
-
-                  {formData.role === "employee" && (
-                    <>
-                      <div>
-                        <label className="block text-sm font-medium text-slate-700">Manager Name (Optional)</label>
+              </form>
+            ) : (
+              <>
+                {step === 1 ? (
+                  <form onSubmit={handleRegisterStep1} className="space-y-5">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="sf-label">Full Name</label>
                         <input
                           type="text"
-                          value={formData.pending_manager_name}
-                          onChange={e => setFormData({ ...formData, pending_manager_name: e.target.value })}
-                          className="mt-1 appearance-none block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-slate-700">Manager Email *</label>
-                        <input
-                          type="email"
                           required
-                          value={formData.pending_manager_email}
-                          onChange={e => setFormData({ ...formData, pending_manager_email: e.target.value })}
-                          className="mt-1 appearance-none block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                          value={formData.name}
+                          onChange={e => setFormData({ ...formData, name: e.target.value })}
+                          className="sf-input"
                         />
                       </div>
-                    </>
-                  )}
+                      <div className="space-y-1.5">
+                        <label className="sf-label">Enterprise Role</label>
+                        <select
+                          value={formData.role}
+                          onChange={e => setFormData({ ...formData, role: e.target.value })}
+                          className="sf-input appearance-none bg-[#121214]"
+                        >
+                          <option value="employee">Employee</option>
+                          <option value="manager">Manager</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="sf-label">Professional Email</label>
+                      <input
+                        type="email"
+                        required
+                        value={formData.email}
+                        onChange={e => setFormData({ ...formData, email: e.target.value })}
+                        className="sf-input"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="sf-label">Secure Password</label>
+                      <input
+                        type="password"
+                        required
+                        value={formData.password}
+                        onChange={e => setFormData({ ...formData, password: e.target.value })}
+                        className="sf-input"
+                      />
+                    </div>
 
-                  <div>
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-                    >
-                      {loading ? "Sending code..." : "Continue"}
-                    </button>
-                  </div>
-                </form>
-              ) : (
-                <form onSubmit={handleRegisterStep2} className="space-y-4">
-                  <div className="bg-blue-50 p-4 rounded-md mb-4 text-sm text-blue-800">
-                    We sent a verification code to <strong>{formData.email}</strong>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700">Verification Code</label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.verification_code}
-                      onChange={e => setFormData({ ...formData, verification_code: e.target.value })}
-                      className="mt-1 appearance-none block w-full px-3 py-2 text-center tracking-widest border border-slate-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-lg font-mono"
-                      maxLength={6}
-                    />
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setStep(1)}
-                      className="w-1/3 flex justify-center py-2 px-4 border border-slate-300 rounded-md shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50"
-                    >
-                      Back
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className="w-2/3 flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-                    >
-                      {loading ? "Verifying..." : "Complete Registration"}
-                    </button>
-                  </div>
-                </form>
-              )}
-            </>
-          )}
+                    {formData.role === "employee" && (
+                      <div className="p-4 bg-white/5 border border-white/5 rounded-sm space-y-4">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-white/30">Manager Approval Required</p>
+                        <div className="space-y-1.5">
+                          <label className="sf-label">Manager Email</label>
+                          <input
+                            type="email"
+                            required
+                            value={formData.pending_manager_email}
+                            onChange={e => setFormData({ ...formData, pending_manager_email: e.target.value })}
+                            className="sf-input"
+                          />
+                        </div>
+                      </div>
+                    )}
 
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-300" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-slate-500">
-                  {isLogin ? "New to clickAway?" : "Already have an account?"}
-                </span>
-              </div>
-            </div>
+                    <button type="submit" disabled={loading} className="sf-btn-primary w-full mt-4 h-12">
+                      {loading ? <Loader2 className="animate-spin" size={16} /> : "Continue"}
+                    </button>
+                  </form>
+                ) : (
+                  <form onSubmit={handleRegisterStep2} className="space-y-6">
+                    <div className="p-6 bg-white/5 border border-white/5 text-center">
+                      <p className="text-xs text-white/60 leading-relaxed">
+                        Security code sent to<br />
+                        <span className="text-white font-bold">{formData.email}</span>
+                      </p>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="sf-label text-center">Verification Code</label>
+                      <input
+                        type="text"
+                        required
+                        value={formData.verification_code}
+                        onChange={e => setFormData({ ...formData, verification_code: e.target.value })}
+                        className="sf-input text-center text-2xl tracking-[0.5em] font-light"
+                        maxLength={6}
+                      />
+                    </div>
+                    <div className="flex gap-4">
+                      <button type="button" onClick={() => setStep(1)} className="sf-btn-secondary flex-1 h-12">Back</button>
+                      <button type="submit" disabled={loading} className="sf-btn-primary flex-[2] h-12">
+                        {loading ? <Loader2 className="animate-spin" size={16} /> : "Confirm"}
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </>
+            )}
 
-            <div className="mt-6">
+            {/* State Toggle */}
+            <div className="pt-8 border-t border-white/5 flex flex-col items-center gap-6">
+              <p className="text-xs text-white/20">
+                {isLogin ? "New to Spaceflow?" : "Already initialized?"}
+              </p>
               <button
-                onClick={() => {
-                  setIsLogin(!isLogin);
-                  setStep(1);
-                }}
-                className="w-full flex justify-center py-2 px-4 border border-blue-600 rounded-md shadow-sm text-sm font-medium text-blue-600 bg-white hover:bg-blue-50"
+                onClick={() => { setIsLogin(!isLogin); setStep(1); }}
+                className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 hover:text-white transition-colors"
               >
-                {isLogin ? "Create an account" : "Sign in"}
+                {isLogin ? "Initialize Account" : "Access Identity"}
               </button>
             </div>
           </div>
-
         </div>
       </div>
     </div>

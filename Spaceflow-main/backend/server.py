@@ -24,6 +24,7 @@ from routers.maintenance_routes import router as maintenance_router
 from routers.analytics_routes import router as analytics_router
 from routers.calendar_routes import router as calendar_router
 from routers.users_routes import router as users_router
+from routers.feedback_routes import router as feedback_router
 
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -82,6 +83,7 @@ api_router.include_router(maintenance_router)
 api_router.include_router(analytics_router)
 api_router.include_router(calendar_router)
 api_router.include_router(users_router)
+api_router.include_router(feedback_router)
 
 app.include_router(api_router)
 

@@ -127,6 +127,7 @@ def _within_availability(resource: Resource, start: datetime, end: datetime) -> 
 async def validate_booking(
     db: AsyncSession, user: User, resource_id: str, start: datetime,
     end: datetime, capacity_requested: int = 1, exclude_booking_id: str | None = None,
+    title: str | None = None,
 ):
     errors: List[ValidationIssue] = []
     warnings: List[ValidationIssue] = []
@@ -134,6 +135,12 @@ async def validate_booking(
 
     if end <= start:
         errors.append(ValidationIssue(code="time_order", message="End time must be after start time."))
+
+    if title is not None:
+        if not title.strip():
+            errors.append(ValidationIssue(code="missing_title", message="Booking title is required."))
+        elif len(title.strip()) < 3:
+            errors.append(ValidationIssue(code="title_too_short", message="Title must be at least 3 characters long."))
 
     resource = (await db.execute(select(Resource).where(Resource.id == resource_id))).scalar_one_or_none()
     if not resource:
@@ -231,7 +238,7 @@ async def validate_booking(
         ))
 
     # Suggestions when errors exist (overlap/capacity/maintenance)
-    if errors:
+    if errors and any(e.code in ("overlap", "capacity_full", "maintenance", "outside_hours") for e in errors):
         suggestions = await smart_suggestions(db, user, resource, start, end, capacity_requested)
 
     requires_approval = bool(resource.requires_approval) or user.reliability_score < 70

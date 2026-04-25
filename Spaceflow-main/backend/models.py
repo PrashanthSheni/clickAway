@@ -54,6 +54,12 @@ class NotificationType(str, enum.Enum):
     approval_required = "approval_required"
 
 
+class FeedbackStatus(str, enum.Enum):
+    pending = "pending"
+    escalated = "escalated"
+    resolved = "resolved"
+
+
 class User(Base):
     __tablename__ = "users"
 
@@ -224,3 +230,21 @@ class LoginAttempt(Base):
     email: Mapped[str] = mapped_column(String, index=True)
     success: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, index=True)
+
+
+class Feedback(Base):
+    __tablename__ = "feedbacks"
+
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=uuid_str)
+    booking_id: Mapped[str] = mapped_column(String, ForeignKey("bookings.id", ondelete="CASCADE"), index=True)
+    user_id: Mapped[str] = mapped_column(String, ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    resource_id: Mapped[str] = mapped_column(String, ForeignKey("resources.id"), index=True)
+    content: Mapped[str] = mapped_column(Text)
+    status: Mapped[FeedbackStatus] = mapped_column(Enum(FeedbackStatus), default=FeedbackStatus.pending)
+    manager_note: Mapped[str | None] = mapped_column(Text, nullable=True)
+    admin_note: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+    user = relationship("User")
+    resource = relationship("Resource")
+    booking = relationship("Booking")

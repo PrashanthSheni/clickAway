@@ -24,9 +24,11 @@ class UserOut(BaseModel):
     no_show_count: int
     cancelled_count: int
 
+
 class ManagerHierarchy(BaseModel):
     manager: UserOut
     employees: List[UserOut]
+
 
 class RegisterIn(BaseModel):
     name: str
@@ -37,6 +39,7 @@ class RegisterIn(BaseModel):
     pending_manager_email: Optional[EmailStr] = None
     verification_code: str
 
+
 class UserUpdate(BaseModel):
     name: Optional[str] = None
     email: Optional[EmailStr] = None
@@ -44,8 +47,10 @@ class UserUpdate(BaseModel):
     department: Optional[str] = None
     manager_id: Optional[str] = None
 
+
 class DeleteUserIn(BaseModel):
     reason: str
+
 
 class SendVerificationCodeIn(BaseModel):
     email: EmailStr
@@ -111,7 +116,7 @@ class ResourceOut(BaseModel):
 
 class BookingIn(BaseModel):
     resource_id: str
-    title: str = ""
+    title: str = Field(..., min_length=3, max_length=100)
     notes: str = ""
     start_time: datetime
     end_time: datetime
@@ -261,3 +266,32 @@ class AnalyticsOverview(BaseModel):
     bookings_by_day: List[dict]
     peak_hours: List[dict]
     underutilized_resources: List[dict]
+
+
+class FeedbackIn(BaseModel):
+    booking_id: str
+    content: str
+
+
+class FeedbackOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: str
+    booking_id: str
+    user_id: str
+    resource_id: str
+    content: str
+    status: str
+    manager_note: Optional[str] = None
+    admin_note: Optional[str] = None
+    created_at: datetime
+    # Enriched
+    user_name: Optional[str] = None
+    resource_name: Optional[str] = None
+
+
+class FeedbackEscalateIn(BaseModel):
+    manager_note: str = ""
+
+
+class FeedbackResolveIn(BaseModel):
+    admin_note: str = ""
