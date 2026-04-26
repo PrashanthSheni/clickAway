@@ -8,6 +8,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "./components/Layout";
 
 import Home from "./pages/Home";
+import Solutions from "./pages/Solutions";
+import Pricing from "./pages/Pricing";
 import Auth from "./pages/Auth";
 import EmployeeDashboard from "./pages/EmployeeDashboard";
 import BrowseResources from "./pages/BrowseResources";
@@ -28,6 +30,8 @@ import AllBookings from "./pages/AllBookings";
 import ResourceCalendar from "./pages/ResourceCalendar";
 import EmployeeProfile from "./pages/EmployeeProfile";
 import NotificationsPanel from "./pages/NotificationsPanel";
+import Settings from "./pages/Settings";
+import Support from "./pages/Support";
 
 function HomeRedirect() {
   const { user } = useAuth();
@@ -46,6 +50,8 @@ function App() {
             <Toaster position="top-right" richColors />
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/solutions" element={<Solutions />} />
+              <Route path="/pricing" element={<Pricing />} />
               <Route path="/auth" element={<Auth />} />
               <Route
                 element={
@@ -64,6 +70,8 @@ function App() {
                 <Route path="checkin" element={<CheckIn />} />
                 <Route path="profile" element={<EmployeeProfile />} />
                 <Route path="notifications" element={<NotificationsPanel />} />
+                <Route path="settings" element={<Settings />} />
+                <Route path="support" element={<Support />} />
                 <Route path="resource/:resourceId/calendar" element={<ResourceCalendar />} />
 
                 <Route

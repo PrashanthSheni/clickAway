@@ -8,18 +8,23 @@ import {
   ShieldCheck, Settings, BarChart3, Bell, LogOut,
   Search, Menu, ChevronRight, HelpCircle
 } from "lucide-react";
+import RadialMenu from "./RadialMenu";
 
 const NAV_ITEMS = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard", roles: [] },
-  { to: "/browse", icon: Boxes, label: "Marketplace", roles: [] },
+  { to: "/browse", icon: Boxes, label: "Resources", roles: [] },
   { to: "/bookings", icon: ListChecks, label: "Audit Log", roles: [] },
   { to: "/calendar", icon: CalendarDays, label: "Network Schedule", roles: [] },
-  { to: "/floor-map", icon: Map, label: "Digital Twins", roles: [] },
+  { to: "/floor-map", icon: Map, label: "Workplace Map", roles: [] },
   { to: "/checkin", icon: QrCode, label: "Session Identity", roles: [] },
+  { to: "/notifications", icon: Bell, label: "Notifications", roles: [] },
   { to: "/manager/approvals", icon: ShieldCheck, label: "Authorizations", roles: ["manager", "admin"] },
-  { to: "/admin", icon: LayoutDashboard, label: "Governance", roles: ["admin"] },
+  { to: "/admin", icon: LayoutDashboard, label: "Console", roles: ["admin"] },
   { to: "/admin/resources", icon: Boxes, label: "Asset Registry", roles: ["admin"] },
   { to: "/admin/reports", icon: BarChart3, label: "Intelligence", roles: ["admin"] },
+  { to: "/profile", icon: UserCircle, label: "My Profile", roles: [] },
+  { to: "/settings", icon: Settings, label: "Settings", roles: [] },
+  { to: "/support", icon: HelpCircle, label: "Support", roles: [] },
 ];
 
 export default function Layout() {
@@ -29,6 +34,7 @@ export default function Layout() {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [scrolled, setScrolled] = useState(false);
+  const [radialOpen, setRadialOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -36,8 +42,24 @@ export default function Layout() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+      if (e.key === "k" && (e.metaKey || e.ctrlKey || !e.metaKey)) {
+        e.preventDefault();
+        setRadialOpen(prev => !prev);
+      }
+      if (e.key === "Escape") {
+        setRadialOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   if (!user) return null;
 
+  const filteredNavItems = NAV_ITEMS.filter(item => item.roles.length === 0 || item.roles.includes(user.role));
   const activeLabel = NAV_ITEMS.find(n => n.to === location.pathname)?.label || "Platform";
 
   return (
@@ -52,7 +74,16 @@ export default function Layout() {
         `}
       >
         {/* Brand */}
-        <div className="flex items-center gap-4 mb-10 group cursor-pointer h-20 px-6" onClick={() => navigate("/")}>
+        <div
+          className="flex items-center gap-4 mb-10 group cursor-pointer h-20 px-6"
+          onClick={() => {
+            if (!sidebarOpen) {
+              setSidebarOpen(true);
+            } else {
+              navigate("/");
+            }
+          }}
+        >
           <img src="/videos/logofinall.png" alt="clickAway" className="h-12 w-12 object-contain shadow-lg" />
           <div className={`flex flex-col transition-opacity duration-300 ${sidebarOpen ? "opacity-100" : "opacity-0 w-0"}`}>
             <span className="font-bold text-lg tracking-tight text-foreground">click<span className="text-primary">A</span>way</span>
@@ -62,7 +93,7 @@ export default function Layout() {
 
         {/* Navigation */}
         <nav className="flex-1 py-8 px-4 space-y-1.5 overflow-y-auto custom-scrollbar">
-          {NAV_ITEMS.filter(n => n.roles.length === 0 || n.roles.includes(user.role)).map(item => (
+          {filteredNavItems.map(item => (
             <NavLink
               key={item.to}
               to={item.to}
@@ -173,7 +204,8 @@ export default function Layout() {
             <Outlet />
           </div>
         </main>
-
+        
+        <RadialMenu isOpen={radialOpen} onClose={() => setRadialOpen(false)} items={filteredNavItems} />
       </div>
     </div>
   );

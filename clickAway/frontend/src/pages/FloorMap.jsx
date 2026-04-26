@@ -292,42 +292,50 @@ export default function FloorMap() {
   const handleSelect = (r) => setSelected(prev => prev?.id === r.id ? null : r);
 
   if (loading) return (
-    <div className="flex items-center justify-center h-80">
-      <Loader2 size={22} className="animate-spin text-indigo-500" />
-      <span className="ml-3 text-gray-500 font-medium">Loading floor plan…</span>
+    <div className="flex flex-col items-center justify-center h-[60vh] animate-pulse">
+      <div className="h-12 w-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin mb-4" />
+      <span className="text-muted-foreground font-black uppercase tracking-[0.2em] text-[10px]">Synchronizing Map Data...</span>
     </div>
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-10 animate-fade-in relative min-h-screen pb-20">
+      {/* Background Decor */}
+      <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/5 blur-[150px] rounded-full pointer-events-none -z-10" />
+      <div className="absolute bottom-20 left-10 w-[400px] h-[400px] bg-blue-500/5 blur-[100px] rounded-full pointer-events-none -z-10" />
+
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <div className="sf-section-title">Visual Map</div>
-          <h1 className="sf-page-title">Floor Plan</h1>
-          <p className="text-sm text-gray-500 mt-1">{filtered.length} spaces available · Interact with any space to view details</p>
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 px-4">
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-[10px] font-black uppercase tracking-[0.2em] text-primary">
+            Digital Infrastructure
+          </div>
+          <h1 className="text-4xl md:text-5xl font-black tracking-tight">Workplace Map</h1>
+          <p className="text-muted-foreground font-medium max-w-lg leading-relaxed">
+            Navigate through our connected ecosystem. Select a node to initialize the booking sequence.
+          </p>
         </div>
         
-        {/* Controls */}
-        <div className="flex flex-wrap items-center gap-3 bg-white/40 backdrop-blur-md p-2 rounded-2xl border border-white/60 shadow-sm">
+        {/* Advanced Controls */}
+        <div className="flex flex-wrap items-center gap-4 bg-background/40 backdrop-blur-xl p-3 rounded-2xl border border-white/5 shadow-2xl">
           {/* Search */}
-          <div className="relative">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <div className="relative group">
+            <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" />
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Search spaces…"
-              className="sf-input w-48 pl-9 py-2"
+              placeholder="Query space identity..."
+              className="bg-accent/50 border border-border/50 text-foreground rounded-xl w-64 pl-12 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all placeholder:text-muted-foreground/30"
             />
           </div>
           {/* Floor tabs */}
-          <div className="flex gap-1">
+          <div className="flex gap-1.5 bg-accent/30 p-1 rounded-xl border border-border/20">
             {["all", ...floors.map(String)].map(f => (
               <button key={f} onClick={() => { setActiveFloor(f); setSelected(null); }}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                className={`px-5 py-2.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${
                   activeFloor === f
-                    ? "bg-indigo-600 text-white shadow-md shadow-indigo-200"
-                    : "text-gray-500 hover:bg-white/60 hover:text-gray-900"
+                    ? "bg-primary text-primary-foreground shadow-[0_0_20px_-5px_rgba(14,165,233,0.5)]"
+                    : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
                 }`}>
                 {f === "all" ? "All" : `F${f}`}
               </button>
@@ -336,59 +344,63 @@ export default function FloorMap() {
         </div>
       </div>
 
-      {/* Main layout */}
-      <div className="flex flex-col lg:flex-row gap-6 items-start">
-        {/* Floor plan canvas */}
-        <div className="flex-1 w-full sf-card p-6 min-h-[600px] overflow-auto">
-          <div className="space-y-6">
-            {/* Zones */}
+      {/* Main Experience Grid */}
+      <div className="flex flex-col xl:flex-row gap-8 px-4 items-start">
+        {/* Map Canvas */}
+        <div className="flex-1 w-full bg-background/40 backdrop-blur-xl rounded-[2.5rem] border border-white/5 p-10 min-h-[750px] shadow-2xl relative overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+          
+          <div className="relative z-10 space-y-12">
+            {/* Zones - Modernized */}
             {byType.room.length > 0 && (
-              <Zone title="Conference & Meeting Rooms" color="#6366F1" description="High-performance spaces for team collaboration">
+              <ZoneSection title="Collaboration Nexus" color="#0ea5e9" description="High-performance meeting environments">
                 {byType.room.map(r => (
-                  <SpaceCard key={r.id} resource={r} isSelected={selected?.id === r.id} onClick={handleSelect} />
+                  <ResourceNode key={r.id} resource={r} isSelected={selected?.id === r.id} onClick={handleSelect} />
                 ))}
-              </Zone>
+              </ZoneSection>
             )}
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
               {byType.desk.length > 0 && (
-                <Zone title="Hot Desks" color="#10B981" description="Flexible open workspaces">
+                <ZoneSection title="Focus Terminals" color="#10b981" description="Personalized productivity pods">
                   {byType.desk.map(r => (
-                    <SpaceCard key={r.id} resource={r} isSelected={selected?.id === r.id} onClick={handleSelect} />
+                    <ResourceNode key={r.id} resource={r} isSelected={selected?.id === r.id} onClick={handleSelect} />
                   ))}
-                </Zone>
+                </ZoneSection>
               )}
               {byType.equipment.length > 0 && (
-                <Zone title="Resources" color="#8B5CF6" description="Available tools & hardware">
+                <ZoneSection title="Asset Clusters" color="#8b5cf6" description="Hardware & peripheral nodes">
                   {byType.equipment.map(r => (
-                    <SpaceCard key={r.id} resource={r} isSelected={selected?.id === r.id} onClick={handleSelect} />
+                    <ResourceNode key={r.id} resource={r} isSelected={selected?.id === r.id} onClick={handleSelect} />
                   ))}
-                </Zone>
+                </ZoneSection>
               )}
             </div>
 
             {byType.parking.length > 0 && (
-              <Zone title="Parking Area" color="#F59E0B" description="Reserved vehicle spaces">
+              <ZoneSection title="Logistics Zone" color="#f59e0b" description="Vehicle containment & storage units">
                 {byType.parking.map(r => (
-                  <SpaceCard key={r.id} resource={r} isSelected={selected?.id === r.id} onClick={handleSelect} />
+                  <ResourceNode key={r.id} resource={r} isSelected={selected?.id === r.id} onClick={handleSelect} />
                 ))}
-              </Zone>
+              </ZoneSection>
             )}
 
             {filtered.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-32 text-center opacity-40">
-                <div className="text-6xl mb-4">🔍</div>
-                <div className="text-lg font-black text-foreground tracking-tight">No spaces found</div>
-                <div className="text-sm font-medium text-muted-foreground">Try a different floor or search term</div>
+              <div className="flex flex-col items-center justify-center py-40 text-center">
+                <div className="h-20 w-20 rounded-full bg-accent/20 flex items-center justify-center mb-6">
+                  <Search size={32} className="text-muted-foreground/30" />
+                </div>
+                <h3 className="text-2xl font-black text-foreground tracking-tight mb-2">Null Set: No Nodes Detected</h3>
+                <p className="text-muted-foreground max-w-xs mx-auto text-sm">The current query parameters returned zero active infrastructure nodes.</p>
               </div>
             )}
           </div>
         </div>
 
-        {/* Side panel */}
+        {/* Cinematic Side Inspector */}
         {selected && (
-          <div className="w-full lg:w-[320px] animate-fade-in-right">
-            <SidePanel
+          <div className="w-full xl:w-[400px] sticky top-24">
+            <ResourceInspector
               resource={selected}
               onClose={() => setSelected(null)}
               onBook={id => navigate(`/book/${id}`)}
@@ -399,3 +411,144 @@ export default function FloorMap() {
     </div>
   );
 }
+
+// ── Refactored Sub-components ───────────────────────────────
+
+function ResourceNode({ resource, isSelected, onClick }) {
+  const cfg = TYPE[resource.type] || TYPE.room;
+  const img = resource.image_url
+    ? (resource.image_url.startsWith("http") ? resource.image_url : `${BACKEND_URL}${resource.image_url}`)
+    : null;
+
+  return (
+    <div
+      onClick={() => onClick(resource)}
+      className={`
+        relative group cursor-pointer p-4 rounded-2xl border transition-all duration-500
+        ${isSelected 
+          ? "bg-primary text-primary-foreground border-primary shadow-[0_0_40px_-10px_rgba(14,165,233,0.6)] scale-105 z-10" 
+          : "bg-accent/40 border-white/5 hover:border-primary/50 hover:bg-accent/60 hover:scale-105"}
+      `}
+      style={{ width: resource.type === "parking" ? 140 : resource.type === "desk" ? 110 : 160 }}
+    >
+      <div className={`absolute top-3 right-3 h-2 w-2 rounded-full ${isSelected ? "bg-white animate-pulse" : "bg-emerald-500"}`} />
+      
+      <div className="flex flex-col items-center text-center gap-3">
+        {img ? (
+          <div className="w-full aspect-[4/3] rounded-xl overflow-hidden shadow-inner bg-black/20">
+            <img src={img} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+          </div>
+        ) : (
+          <div className="text-3xl py-2">{cfg.icon}</div>
+        )}
+        
+        <div className="space-y-1 w-full">
+          <div className={`text-xs font-black truncate uppercase tracking-tighter ${isSelected ? "text-white" : "text-foreground"}`}>
+            {resource.name}
+          </div>
+          <div className={`text-[9px] font-bold flex items-center justify-center gap-2 ${isSelected ? "text-white/70" : "text-muted-foreground"}`}>
+            <span>👥 {resource.capacity}</span>
+            <span className="opacity-30">•</span>
+            <span>FL {resource.floor}</span>
+          </div>
+        </div>
+      </div>
+
+      {isSelected && (
+        <div className="absolute inset-x-0 -bottom-1 h-1 bg-white/20 rounded-full blur-sm" />
+      )}
+    </div>
+  );
+}
+
+function ZoneSection({ title, color, children, description }) {
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-4">
+        <div className="h-10 w-1 px-0.5 rounded-full" style={{ backgroundColor: color }} />
+        <div>
+          <h3 className="text-lg font-black uppercase tracking-widest text-foreground">{title}</h3>
+          <p className="text-xs font-medium text-muted-foreground">{description}</p>
+        </div>
+      </div>
+      <div className="flex flex-wrap gap-6 p-2">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function ResourceInspector({ resource, onClose, onBook }) {
+  const cfg = TYPE[resource.type] || TYPE.room;
+  const img = resource.image_url
+    ? (resource.image_url.startsWith("http") ? resource.image_url : `${BACKEND_URL}${resource.image_url}`)
+    : null;
+
+  return (
+    <div className="bg-background/80 backdrop-blur-2xl rounded-[2rem] border border-white/10 overflow-hidden shadow-2xl animate-fade-in-right">
+      <div className="relative h-56 group">
+        {img ? (
+          <img src={img} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[2s]" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-7xl bg-accent/40">{cfg.icon}</div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+        <button 
+          onClick={onClose}
+          className="absolute top-6 right-6 p-2 bg-black/40 hover:bg-black/60 text-white rounded-xl backdrop-blur-md border border-white/10 transition-all active:scale-95"
+        >
+          <X size={18} />
+        </button>
+        <div className="absolute bottom-6 left-8 right-8">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="px-3 py-1 rounded-full bg-primary text-primary-foreground text-[9px] font-black uppercase tracking-widest">
+              {cfg.label}
+            </span>
+          </div>
+          <h2 className="text-2xl font-black text-white tracking-tight">{resource.name}</h2>
+        </div>
+      </div>
+
+      <div className="p-8 space-y-8">
+        <p className="text-sm text-muted-foreground leading-relaxed font-medium italic">
+          "{resource.description || "No tactical description available for this coordinate."}"
+        </p>
+
+        <div className="grid grid-cols-3 gap-3">
+          {[
+            { icon: <MapPin size={16} />, label: "FLOOR", val: resource.floor },
+            { icon: <Users size={16} />,  label: "UNITS", val: resource.capacity },
+            { icon: <Clock size={16} />,  label: "UPTIME", val: resource.availability_start || "08:00" },
+          ].map(stat => (
+            <div key={stat.label} className="bg-accent/40 rounded-2xl p-4 border border-border/20 text-center space-y-1">
+              <div className="flex justify-center text-primary mb-1">{stat.icon}</div>
+              <div className="text-sm font-black text-foreground">{stat.val}</div>
+              <div className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest">{stat.label}</div>
+            </div>
+          ))}
+        </div>
+
+        {resource.amenities?.length > 0 && (
+          <div className="space-y-3">
+            <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Infrastructure Features</div>
+            <div className="flex flex-wrap gap-2">
+              {resource.amenities.map(a => (
+                <span key={a} className="px-3 py-1.5 rounded-lg bg-accent/60 border border-border/40 text-[10px] font-bold text-foreground">
+                  {a}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <button
+          onClick={() => onBook(resource.id)}
+          className="w-full py-5 rounded-2xl bg-primary text-primary-foreground font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 shadow-[0_10px_30px_-10px_rgba(14,165,233,0.5)] hover:shadow-[0_15px_40px_-10px_rgba(14,165,233,0.6)] hover:-translate-y-1 transition-all active:translate-y-0"
+        >
+          Initialize Booking <ArrowRight size={16} />
+        </button>
+      </div>
+    </div>
+  );
+}
+

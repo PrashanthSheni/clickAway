@@ -121,10 +121,10 @@ export default function AdminDashboard() {
         <div>
            <div className="flex items-center gap-2 mb-1">
              <span className="sf-section-label">System Admin</span>
-             <span className="text-slate-300">•</span>
-             <span className="text-xs font-medium text-slate-500">Node Cluster: Frankfurt-01</span>
+             <span className="text-muted-foreground/40">•</span>
+             <span className="text-xs font-medium text-muted-foreground">Node Cluster: Frankfurt-01</span>
            </div>
-           <h1 className="text-3xl font-bold text-slate-900 tracking-tight">System Console</h1>
+           <h1 className="text-3xl font-bold text-foreground tracking-tight">System Console</h1>
         </div>
         <div className="flex items-center gap-3">
            <button className="sf-btn-secondary py-2 h-auto text-xs px-4">
@@ -137,13 +137,13 @@ export default function AdminDashboard() {
       </div>
 
       {/* ── Tabs Navigation ── */}
-      <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl w-fit overflow-x-auto max-w-full">
+      <div className="flex items-center gap-1 bg-accent p-1 rounded-xl w-fit overflow-x-auto max-w-full border border-border/50">
          {["overview", "issues", "identities", "hierarchy"].map(tab => (
            <button
              key={tab}
              onClick={() => setActiveTab(tab)}
              className={`px-6 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all whitespace-nowrap ${
-               activeTab === tab ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-900"
+               activeTab === tab ? "bg-background text-primary shadow-sm border border-border/50" : "text-muted-foreground hover:text-foreground"
              }`}
            >
              {tab === "issues" ? `Escalated Issues (${openIssues.length})` : tab}
@@ -168,8 +168,8 @@ export default function AdminDashboard() {
                         <kpi.icon size={20} />
                      </div>
                   </div>
-                  <div className="text-2xl font-bold text-slate-900">{kpi.value}</div>
-                  <div className="text-xs font-medium text-slate-500 mt-1 uppercase tracking-wider">{kpi.label}</div>
+                  <div className="text-2xl font-bold text-foreground">{kpi.value}</div>
+                  <div className="text-xs font-medium text-muted-foreground mt-1 uppercase tracking-wider">{kpi.label}</div>
                </div>
              ))}
           </div>
@@ -202,7 +202,7 @@ export default function AdminDashboard() {
           </div>
 
           <div className="sf-card p-8">
-             <h3 className="font-bold text-slate-900 flex items-center gap-2 uppercase tracking-widest text-xs mb-8">Network Velocity</h3>
+             <h3 className="font-bold text-foreground flex items-center gap-2 uppercase tracking-widest text-xs mb-8">Network Velocity</h3>
              <div className="h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
                    <AreaChart data={overview.bookings_by_day}>
@@ -221,27 +221,27 @@ export default function AdminDashboard() {
            {openIssues.length === 0 ? (
              <div className="sf-card py-24 flex flex-col items-center justify-center text-center">
                 <ShieldCheck size={32} className="text-emerald-500 mb-6" />
-                <h3 className="text-xl font-bold text-slate-900">All Systems Nominal</h3>
+                <h3 className="text-xl font-bold text-foreground">All Systems Nominal</h3>
              </div>
            ) : (
              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {openIssues.map(f => (
                   <div key={f.id} className="sf-card overflow-hidden flex flex-col">
-                     <div className="p-6 bg-red-50/50 border-b border-red-100 flex items-center justify-between">
+                     <div className="p-6 bg-red-500/10 border-b border-red-500/20 flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                           <div className="h-8 w-8 bg-red-600 text-white rounded-lg flex items-center justify-center shadow-lg shadow-red-200"><AlertTriangle size={16} /></div>
+                           <div className="h-8 w-8 bg-red-600 text-white rounded-lg flex items-center justify-center shadow-lg shadow-red-500/20"><AlertTriangle size={16} /></div>
                            <div>
-                              <div className="text-sm font-bold text-slate-900">{f.resource_name}</div>
-                              <div className="text-[10px] text-red-600 font-bold uppercase">Priority Escalation</div>
+                              <div className="text-sm font-bold text-foreground">{f.resource_name}</div>
+                              <div className="text-[10px] text-red-500 font-bold uppercase">Priority Escalation</div>
                            </div>
                         </div>
                      </div>
                      <div className="p-6 flex-1 space-y-4">
-                        <p className="text-sm text-slate-700 bg-white p-4 rounded-xl border border-slate-100 italic">"{f.content}"</p>
-                        {f.manager_note && <p className="text-xs text-indigo-600 font-bold">Manager Oversight: <span className="text-slate-600 font-normal">{f.manager_note}</span></p>}
+                        <p className="text-sm text-muted-foreground bg-accent/40 p-4 rounded-xl border border-border/40 italic">"{f.content}"</p>
+                        {f.manager_note && <p className="text-xs text-primary font-bold">Manager Oversight: <span className="text-muted-foreground font-normal">{f.manager_note}</span></p>}
                      </div>
-                     <div className="p-6 bg-slate-50 border-t border-slate-100">
-                        <button onClick={() => setResolvingFeedback(f)} className="w-full py-3 bg-indigo-600 text-white rounded-xl text-xs font-bold uppercase">Initialize Resolution</button>
+                     <div className="p-6 bg-accent/20 border-t border-border/40">
+                        <button onClick={() => setResolvingFeedback(f)} className="w-full py-3 bg-primary text-primary-foreground hover:bg-primary/90 transition-all rounded-xl text-xs font-bold uppercase">Initialize Resolution</button>
                      </div>
                   </div>
                 ))}
@@ -251,14 +251,14 @@ export default function AdminDashboard() {
       ) : activeTab === "identities" ? (
         /* ── All Personnel Tab ── */
         <div className="sf-card overflow-hidden">
-           <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
-              <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">Global Identity Roster</h3>
-              <div className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">{allUsers.length} Units Active</div>
+           <div className="p-6 border-b border-border/50 bg-accent/30 flex items-center justify-between">
+              <h3 className="text-xs font-black text-muted-foreground uppercase tracking-widest">Global Identity Roster</h3>
+              <div className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">{allUsers.length} Units Active</div>
            </div>
            <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                  <thead>
-                    <tr className="border-b border-slate-100 text-[10px] uppercase tracking-tighter text-slate-400 font-black">
+                    <tr className="border-b border-border/50 text-[10px] uppercase tracking-tighter text-muted-foreground font-black">
                        <th className="px-6 py-4">Identity</th>
                        <th className="px-6 py-4">Role / Department</th>
                        <th className="px-6 py-4">Network Trust</th>
@@ -266,39 +266,39 @@ export default function AdminDashboard() {
                        <th className="px-6 py-4 text-right">Actions</th>
                     </tr>
                  </thead>
-                 <tbody className="divide-y divide-slate-50">
+                 <tbody className="divide-y divide-border/20">
                     {allUsers.map(u => (
-                      <tr key={u.id} className="hover:bg-slate-50/50 transition-colors">
+                      <tr key={u.id} className="hover:bg-accent/40 transition-colors">
                          <td className="px-6 py-4">
                             <div className="flex items-center gap-3">
-                               <div className="h-8 w-8 rounded-lg bg-slate-100 flex items-center justify-center font-bold text-slate-600 text-xs">{u.name.charAt(0)}</div>
+                               <div className="h-8 w-8 rounded-lg bg-accent flex items-center justify-center font-bold text-foreground text-xs border border-border/40">{u.name.charAt(0)}</div>
                                <div>
-                                  <div className="text-sm font-bold text-slate-900">{u.name}</div>
-                                  <div className="text-[10px] text-slate-400 font-medium flex items-center gap-1"><Mail size={8} /> {u.email}</div>
+                                  <div className="text-sm font-bold text-foreground">{u.name}</div>
+                                  <div className="text-[10px] text-muted-foreground/60 font-medium flex items-center gap-1"><Mail size={8} /> {u.email}</div>
                                </div>
                             </div>
                          </td>
                          <td className="px-6 py-4">
-                            <div className="text-[10px] font-bold text-indigo-600 uppercase mb-0.5">{u.role}</div>
-                            <div className="text-xs text-slate-500">{u.department}</div>
+                            <div className="text-[10px] font-bold text-primary uppercase mb-0.5">{u.role}</div>
+                            <div className="text-xs text-muted-foreground">{u.department}</div>
                          </td>
                          <td className="px-6 py-4">
                             <div className="flex items-center gap-2">
-                               <div className="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                  <div className="h-full bg-indigo-600" style={{ width: `${u.reliability_score}%` }} />
+                               <div className="w-16 h-1.5 bg-accent rounded-full overflow-hidden">
+                                  <div className="h-full bg-primary" style={{ width: `${u.reliability_score}%` }} />
                                </div>
-                               <span className="text-[10px] font-black text-slate-900">{Math.round(u.reliability_score)}%</span>
+                               <span className="text-[10px] font-black text-foreground">{Math.round(u.reliability_score)}%</span>
                             </div>
                          </td>
                          <td className="px-6 py-4">
-                            <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${u.status === 'approved' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
+                            <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full border ${u.status === 'approved' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 'bg-amber-500/10 text-amber-500 border-amber-500/20'}`}>
                                {u.status}
                             </span>
                          </td>
                          <td className="px-6 py-4 text-right">
                             <div className="flex items-center justify-end gap-2">
-                               <button onClick={() => handleOpenEdit(u)} className="p-2 text-slate-300 hover:text-indigo-600 transition-colors"><Edit2 size={16} /></button>
-                               <button onClick={() => setDeletingUser(u)} className="p-2 text-slate-300 hover:text-red-600 transition-colors"><Trash2 size={16} /></button>
+                               <button onClick={() => handleOpenEdit(u)} className="p-2 text-muted-foreground/40 hover:text-primary transition-colors"><Edit2 size={16} /></button>
+                               <button onClick={() => setDeletingUser(u)} className="p-2 text-muted-foreground/40 hover:text-destructive transition-colors"><Trash2 size={16} /></button>
                             </div>
                          </td>
                       </tr>
@@ -349,16 +349,16 @@ export default function AdminDashboard() {
 
       {/* ── Resolution Modal ... ── */}
       {resolvingFeedback && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-8">
-           <div className="sf-card w-full max-w-lg p-8 relative shadow-2xl animate-fade-in-up">
-              <button onClick={() => setResolvingFeedback(null)} className="absolute top-6 right-6 text-slate-400 hover:text-slate-900 transition-colors"><X size={20} /></button>
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-[100] flex items-center justify-center p-8">
+           <div className="sf-card w-full max-w-lg p-8 relative shadow-2xl animate-fade-in-up border-border">
+              <button onClick={() => setResolvingFeedback(null)} className="absolute top-6 right-6 text-muted-foreground hover:text-foreground transition-colors"><X size={20} /></button>
               <div className="mb-8">
-                 <div className="sf-section-label mb-3 !bg-emerald-600 !text-white">Issue Resolution</div>
-                 <h2 className="text-2xl font-bold text-slate-900">Resolve System Issue</h2>
+                 <div className="sf-badge mb-3 !bg-emerald-500/20 !text-emerald-500 !border-emerald-500/30">Issue Resolution</div>
+                 <h2 className="text-2xl font-bold text-foreground">Resolve System Issue</h2>
               </div>
               <form onSubmit={handleResolve} className="space-y-6">
                  <textarea required rows={4} className="sf-input py-4 resize-none" placeholder="Resolution details..." value={adminNote} onChange={e => setAdminNote(e.target.value)} />
-                 <div className="flex gap-4"><button type="submit" className="sf-btn-primary flex-1 bg-emerald-600 hover:bg-emerald-700 shadow-emerald-100">Mark Resolved</button></div>
+                 <div className="flex gap-4"><button type="submit" className="sf-btn-primary flex-1 bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/20">Mark Resolved</button></div>
               </form>
            </div>
         </div>
@@ -366,20 +366,20 @@ export default function AdminDashboard() {
 
       {/* ── Edit User Modal ── */}
       {editingUser && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-8">
-           <div className="sf-card w-full max-w-lg p-8 relative shadow-2xl animate-fade-in-up">
-              <button onClick={() => setEditingUser(null)} className="absolute top-6 right-6 text-slate-400 hover:text-slate-900 transition-colors"><X size={20} /></button>
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-[100] flex items-center justify-center p-8">
+           <div className="sf-card w-full max-w-lg p-8 relative shadow-2xl animate-fade-in-up border-border">
+              <button onClick={() => setEditingUser(null)} className="absolute top-6 right-6 text-muted-foreground hover:text-foreground transition-colors"><X size={20} /></button>
               <div className="mb-8">
-                 <div className="sf-section-label mb-3">Identity Management</div>
-                 <h2 className="text-2xl font-bold text-slate-900">Edit {editingUser.name}</h2>
+                 <div className="sf-badge mb-3 !bg-primary/20 !text-primary !border-primary/30">Identity Management</div>
+                 <h2 className="text-2xl font-bold text-foreground">Edit {editingUser.name}</h2>
               </div>
               <form onSubmit={handleUpdateUser} className="space-y-4">
                  <div className="space-y-1">
-                    <label className="text-[10px] font-black uppercase text-slate-400 ml-1">Full Name</label>
+                    <label className="text-[10px] font-black uppercase text-muted-foreground ml-1">Full Name</label>
                     <input required className="sf-input" value={editForm.name} onChange={e => setEditForm({...editForm, name: e.target.value})} />
                  </div>
                  <div className="space-y-1">
-                    <label className="text-[10px] font-black uppercase text-slate-400 ml-1">Email Address</label>
+                    <label className="text-[10px] font-black uppercase text-muted-foreground ml-1">Email Address</label>
                     <input required type="email" className="sf-input" value={editForm.email} onChange={e => setEditForm({...editForm, email: e.target.value})} />
                  </div>
                  <div className="grid grid-cols-2 gap-4">
@@ -410,18 +410,18 @@ export default function AdminDashboard() {
 
       {/* ── Delete User Modal ── */}
       {deletingUser && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[110] flex items-center justify-center p-8">
-           <div className="sf-card w-full max-w-md p-8 relative shadow-2xl border-red-100 animate-fade-in-up">
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-[110] flex items-center justify-center p-8">
+           <div className="sf-card w-full max-w-md p-8 relative shadow-2xl border-red-500/20 animate-fade-in-up">
               <div className="flex flex-col items-center text-center">
-                 <div className="h-16 w-16 bg-red-50 text-red-600 rounded-full flex items-center justify-center mb-6">
+                 <div className="h-16 w-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mb-6 border border-red-500/20">
                     <AlertTriangle size={32} />
                  </div>
-                 <h2 className="text-xl font-bold text-slate-900 mb-2">Purge Identity?</h2>
-                 <p className="text-sm text-slate-500 mb-8">This will permanently remove <span className="font-bold text-slate-900">{deletingUser.name}</span> from the network infrastructure. This action cannot be undone.</p>
+                 <h2 className="text-xl font-bold text-foreground mb-2">Purge Identity?</h2>
+                 <p className="text-sm text-muted-foreground mb-8">This will permanently remove <span className="font-bold text-foreground">{deletingUser.name}</span> from the network infrastructure. This action cannot be undone.</p>
                  
                  <div className="w-full space-y-4">
                     <div className="text-left space-y-1">
-                        <label className="text-[10px] font-black uppercase text-slate-400 ml-1">Reason for Deletion</label>
+                        <label className="text-[10px] font-black uppercase text-muted-foreground ml-1">Reason for Deletion</label>
                         <textarea 
                            className="sf-input py-3 resize-none" 
                            placeholder="Ex: Contract Terminated..." 
@@ -431,7 +431,7 @@ export default function AdminDashboard() {
                     </div>
                     <div className="flex gap-3 pt-2">
                        <button onClick={() => setDeletingUser(null)} className="flex-1 sf-btn-secondary">Cancel</button>
-                       <button onClick={handleDeleteUser} className="flex-1 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold uppercase py-3 transition-all shadow-lg shadow-red-100">Purge Unit</button>
+                       <button onClick={handleDeleteUser} className="flex-1 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold uppercase py-3 transition-all shadow-lg shadow-red-500/20">Purge Unit</button>
                     </div>
                  </div>
               </div>
