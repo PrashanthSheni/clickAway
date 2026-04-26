@@ -69,32 +69,153 @@ const Solutions = () => {
                <Link to="/auth" className="sf-btn-primary px-5 py-2 text-xs">Sign In</Link>
             </div>
          </nav>
+{/* ── Solutions Hero ── */}
+<section className="relative min-h-screen flex items-center justify-start px-8 md:px-12 overflow-hidden text-white">
+  <div className="absolute inset-0 z-0">
+    <img
+      src="/videos/camera.jpeg"
+      className="w-full h-full object-cover opacity-80"
+      alt=""
+    />
+    <div className="absolute inset-0 bg-black/40" />
+    <div className="absolute inset-0 bg-gradient-to-r from-black/55 via-black/20 to-black/55" />
+  </div>
 
-         {/* ── Solutions Hero ── */}
-         <section className="relative min-h-screen flex flex-col items-center justify-center pt-24 px-8 overflow-hidden text-white">
-            <div className="absolute inset-0 z-0">
-               <img
-                  src="/videos/camera.jpeg"
-                  className="w-full h-full object-cover opacity-60"
-                  alt=""
-               />
-               <div className="absolute inset-0 bg-gradient-to-b from-[#050505]/60 via-transparent to-[#050505]" />
+  <div className="relative z-10 w-full max-w-7xl mx-auto">
+    <div className="max-w-5xl pt-20 md:pt-28 animate-fade-in-up">
+      
+      <span className="block text-[10px] md:text-xs font-black uppercase tracking-[0.45em] text-primary mb-6 md:mb-8">
+        Enterprise Intelligence
+      </span>
+
+      <h1 className="leading-[0.9] tracking-[-0.035em] font-black">
+        <span className="block text-[4rem] sm:text-[5rem] md:text-[6.8rem] lg:text-[8rem] text-white">
+          Exhaustive
+        </span>
+        <span className="block text-[4rem] sm:text-[5rem] md:text-[6.8rem] lg:text-[8rem] text-white">
+          Power.
+        </span>
+        <span className="block text-[4rem] sm:text-[5rem] md:text-[6.8rem] lg:text-[8rem] text-white/40">
+          Total Control.
+        </span>
+      </h1>
+
+      <p className="mt-8 md:mt-10 max-w-3xl text-base md:text-xl leading-snug font-medium text-white/65">
+        Unified identity for the modern enterprise. Scale your workspace
+        efficiency through our secure AI-driven ecosystem.
+      </p>
+    </div>
+  </div>
+</section>
+{/* ── AI Suggestion Engine Section ── */}
+<section className="relative py-24 md:py-32 px-8 md:px-12 bg-[#050505] text-white overflow-hidden">
+  {/* ambient glow */}
+  <div className="absolute inset-0 pointer-events-none">
+    <div className="absolute right-[18%] top-1/2 -translate-y-1/2 w-[480px] h-[480px] rounded-full bg-cyan-500/8 blur-[130px]" />
+    <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_50%,rgba(0,140,255,0.06),transparent_38%)]" />
+  </div>
+
+  <div className="relative z-10 max-w-7xl mx-auto grid lg:grid-cols-[1.05fr_0.95fr] gap-12 xl:gap-16 items-start">
+    
+    {/* Left Content */}
+    <div className="max-w-xl">
+      <h2 className="text-[2.6rem] sm:text-[3.4rem] md:text-[4.2rem] font-black tracking-[-0.04em] leading-[0.92] text-white">
+        Suggestion
+        <br />
+        Engine
+      </h2>
+
+      <p className="mt-6 text-sm md:text-lg leading-[1.55] text-white/55 max-w-lg font-medium">
+        We don't just reject bookings. Our backend uses high-fidelity algorithms to
+        scan your entire facility and offer proactive alternatives in real-time.
+      </p>
+
+      <div className="mt-12 space-y-8">
+        {[
+          {
+            title: "Dynamic Scoring",
+            desc: "Every suggestion is ranked by proximity and similarity to your initial request."
+          },
+          {
+            title: "Smart Substitution",
+            desc: "Automatically upgrade to larger spaces if smaller units are occupied."
+          },
+          {
+            title: "Conflict Mitigation",
+            desc: "Instantly finds the next available window, minimizing calendar friction."
+          }
+        ].map((item, i) => (
+          <div key={i} className="flex items-start gap-4">
+            <div className="mt-1 flex h-5 w-5 items-center justify-center rounded-full border border-cyan-400/30 bg-cyan-400/5">
+              <div className="h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.85)]" />
             </div>
 
-            <div className="relative z-10 max-w-5xl text-center space-y-8 animate-fade-in-up">
-               <div className="space-y-4">
-                  <span className="text-xs font-black uppercase tracking-[0.4em] text-primary">Enterprise Intelligence</span>
-                  <h1 className="text-5xl md:text-9xl font-black tracking-tighter leading-[0.85] bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60">
-                     Exhaustive Power.<br />
-                     <span className="text-white/40">Total Control.</span>
-                  </h1>
-               </div>
-               <p className="text-lg md:text-2xl text-white/40 max-w-2xl mx-auto font-medium leading-relaxed">
-                  We don't just manage spaces. We solve the fundamental inefficiencies of modern real estate.
-               </p>
+            <div>
+              <h3 className="text-lg md:text-xl font-bold tracking-tight text-white">
+                {item.title}
+              </h3>
+              <p className="mt-1.5 text-sm md:text-base leading-relaxed text-white/35 font-medium max-w-lg">
+                {item.desc}
+              </p>
             </div>
-         </section>
+          </div>
+        ))}
+      </div>
+    </div>
 
+    {/* Right Panel */}
+    <div className="relative">
+      <div className="relative rounded-[2.25rem] border border-white/5 bg-[#070707] p-5 md:p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.02),0_30px_80px_rgba(0,0,0,0.6)]">
+        
+        {/* soft panel glow */}
+        <div className="absolute inset-0 rounded-[2.25rem] bg-[radial-gradient(circle_at_50%_50%,rgba(0,170,255,0.06),transparent_55%)] pointer-events-none" />
+
+        <div className="relative space-y-5">
+          {[
+            {
+              label: "Attempt",
+              title: "Boardroom 402",
+              status: "Occupied",
+              color: "text-red-400"
+            },
+            {
+              label: "Suggestion",
+              title: "Executive Suite 408",
+              status: "98% Match",
+              color: "text-cyan-400"
+            },
+            {
+              label: "Suggestion",
+              title: "Boardroom 402 @ 2:30 PM",
+              status: "Available",
+              color: "text-cyan-400"
+            }
+          ].map((card, i) => (
+            <div
+              key={i}
+              className="group cursor-pointer rounded-[1.6rem] border border-white/[0.04] bg-white/[0.02] px-5 py-5 md:px-6 md:py-6 transition-all duration-300 hover:border-cyan-400/30 hover:bg-cyan-400/[0.04] hover:shadow-[0_0_0_1px_rgba(34,211,238,0.08),0_0_30px_rgba(34,211,238,0.08)]"
+            >
+              <div className="flex items-start justify-between gap-5">
+                <div>
+                  <div className="text-[9px] uppercase tracking-[0.22em] font-black text-white/20 transition-colors duration-300 group-hover:text-white/35">
+                    {card.label}
+                  </div>
+                  <div className="mt-1.5 text-lg md:text-xl font-bold tracking-tight text-white transition-colors duration-300 group-hover:text-cyan-300">
+                    {card.title}
+                  </div>
+                </div>
+
+                <div className={`text-[10px] font-black uppercase tracking-[0.14em] mt-1.5 transition-colors duration-300 ${card.color} group-hover:text-cyan-300`}>
+                  {card.status}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
          {/* ── Problem/Solution Solver Section ── */}
          <section className="py-32 px-8 max-w-7xl mx-auto">
             <div className="grid md:grid-cols-2 gap-16">
