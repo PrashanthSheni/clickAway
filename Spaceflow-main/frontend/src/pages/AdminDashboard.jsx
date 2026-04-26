@@ -32,6 +32,10 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [resolvingFeedback, setResolvingFeedback] = useState(null);
   const [adminNote, setAdminNote] = useState("");
+  const [editingUser, setEditingUser] = useState(null);
+  const [deletingUser, setDeletingUser] = useState(null);
+  const [deleteReason, setDeleteReason] = useState("");
+  const [editForm, setEditForm] = useState({ name: "", email: "", role: "", department: "", manager_id: "" });
 
   const loadData = async () => {
     try {
@@ -62,6 +66,42 @@ export default function AdminDashboard() {
       loadData();
     } catch (_) {
       toast.error("Failed to resolve issue");
+    }
+  };
+
+  const handleOpenEdit = (user) => {
+    setEditingUser(user);
+    setEditForm({
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      department: user.department || "",
+      manager_id: user.manager_id || ""
+    });
+  };
+
+  const handleUpdateUser = async (e) => {
+    e.preventDefault();
+    try {
+      await api.put(`/users/${editingUser.id}`, editForm);
+      toast.success("User identity updated");
+      setEditingUser(null);
+      loadData();
+    } catch (_) {
+      toast.error("Failed to update user");
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    if (!deleteReason) return toast.error("Please provide a reason for deletion");
+    try {
+      await api.delete(`/users/${deletingUser.id}`, { data: { reason: deleteReason } });
+      toast.success("User identity purged");
+      setDeletingUser(null);
+      setDeleteReason("");
+      loadData();
+    } catch (_) {
+      toast.error("Failed to delete user");
     }
   };
 
@@ -256,7 +296,10 @@ export default function AdminDashboard() {
                             </span>
                          </td>
                          <td className="px-6 py-4 text-right">
-                            <button className="p-2 text-slate-300 hover:text-indigo-600 transition-colors"><MoreVertical size={16} /></button>
+                            <div className="flex items-center justify-end gap-2">
+                               <button onClick={() => handleOpenEdit(u)} className="p-2 text-slate-300 hover:text-indigo-600 transition-colors"><Edit2 size={16} /></button>
+                               <button onClick={() => setDeletingUser(u)} className="p-2 text-slate-300 hover:text-red-600 transition-colors"><Trash2 size={16} /></button>
+                            </div>
                          </td>
                       </tr>
                     ))}
@@ -277,7 +320,10 @@ export default function AdminDashboard() {
                          <div className="text-[10px] text-slate-400 uppercase font-black tracking-widest">{item.manager.department} Executive</div>
                       </div>
                    </div>
-                   <div className="text-[10px] font-black text-indigo-600 uppercase bg-indigo-50 px-2 py-1 rounded-lg">Hierarchy Root</div>
+                   <div className="flex items-center gap-2">
+                      <button onClick={() => handleOpenEdit(item.manager)} className="p-1.5 text-slate-400 hover:text-indigo-600 transition-colors"><Edit2 size={14} /></button>
+                      <div className="text-[10px] font-black text-indigo-600 uppercase bg-indigo-50 px-2 py-1 rounded-lg">Hierarchy Root</div>
+                   </div>
                 </div>
                 <div className="space-y-4">
                    {item.employees.map(emp => (
@@ -289,7 +335,10 @@ export default function AdminDashboard() {
                               <div className="text-[10px] text-slate-400">{emp.email}</div>
                            </div>
                         </div>
-                        <div className="text-[10px] font-black text-slate-900">{Math.round(emp.reliability_score)}% Trust</div>
+                        <div className="flex items-center gap-3">
+                           <div className="text-[10px] font-black text-slate-900">{Math.round(emp.reliability_score)}% Trust</div>
+                           <button onClick={() => handleOpenEdit(emp)} className="p-1.5 text-slate-300 hover:text-indigo-600 transition-colors"><Edit2 size={14} /></button>
+                        </div>
                      </div>
                    ))}
                 </div>
@@ -311,6 +360,81 @@ export default function AdminDashboard() {
                  <textarea required rows={4} className="sf-input py-4 resize-none" placeholder="Resolution details..." value={adminNote} onChange={e => setAdminNote(e.target.value)} />
                  <div className="flex gap-4"><button type="submit" className="sf-btn-primary flex-1 bg-emerald-600 hover:bg-emerald-700 shadow-emerald-100">Mark Resolved</button></div>
               </form>
+           </div>
+        </div>
+      )}
+
+      {/* ── Edit User Modal ── */}
+      {editingUser && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-8">
+           <div className="sf-card w-full max-w-lg p-8 relative shadow-2xl animate-fade-in-up">
+              <button onClick={() => setEditingUser(null)} className="absolute top-6 right-6 text-slate-400 hover:text-slate-900 transition-colors"><X size={20} /></button>
+              <div className="mb-8">
+                 <div className="sf-section-label mb-3">Identity Management</div>
+                 <h2 className="text-2xl font-bold text-slate-900">Edit {editingUser.name}</h2>
+              </div>
+              <form onSubmit={handleUpdateUser} className="space-y-4">
+                 <div className="space-y-1">
+                    <label className="text-[10px] font-black uppercase text-slate-400 ml-1">Full Name</label>
+                    <input required className="sf-input" value={editForm.name} onChange={e => setEditForm({...editForm, name: e.target.value})} />
+                 </div>
+                 <div className="space-y-1">
+                    <label className="text-[10px] font-black uppercase text-slate-400 ml-1">Email Address</label>
+                    <input required type="email" className="sf-input" value={editForm.email} onChange={e => setEditForm({...editForm, email: e.target.value})} />
+                 </div>
+                 <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                        <label className="text-[10px] font-black uppercase text-slate-400 ml-1">Role</label>
+                        <select className="sf-input" value={editForm.role} onChange={e => setEditForm({...editForm, role: e.target.value})}>
+                            <option value="employee">Employee</option>
+                            <option value="manager">Manager</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-[10px] font-black uppercase text-slate-400 ml-1">Department</label>
+                        <input className="sf-input" value={editForm.department} onChange={e => setEditForm({...editForm, department: e.target.value})} />
+                    </div>
+                 </div>
+                 <div className="space-y-1">
+                    <label className="text-[10px] font-black uppercase text-slate-400 ml-1">Manager ID (Optional)</label>
+                    <input className="sf-input" value={editForm.manager_id} onChange={e => setEditForm({...editForm, manager_id: e.target.value})} />
+                 </div>
+                 <div className="flex gap-4 pt-4">
+                    <button type="submit" className="sf-btn-primary flex-1">Apply Identity Changes</button>
+                 </div>
+              </form>
+           </div>
+        </div>
+      )}
+
+      {/* ── Delete User Modal ── */}
+      {deletingUser && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[110] flex items-center justify-center p-8">
+           <div className="sf-card w-full max-w-md p-8 relative shadow-2xl border-red-100 animate-fade-in-up">
+              <div className="flex flex-col items-center text-center">
+                 <div className="h-16 w-16 bg-red-50 text-red-600 rounded-full flex items-center justify-center mb-6">
+                    <AlertTriangle size={32} />
+                 </div>
+                 <h2 className="text-xl font-bold text-slate-900 mb-2">Purge Identity?</h2>
+                 <p className="text-sm text-slate-500 mb-8">This will permanently remove <span className="font-bold text-slate-900">{deletingUser.name}</span> from the network infrastructure. This action cannot be undone.</p>
+                 
+                 <div className="w-full space-y-4">
+                    <div className="text-left space-y-1">
+                        <label className="text-[10px] font-black uppercase text-slate-400 ml-1">Reason for Deletion</label>
+                        <textarea 
+                           className="sf-input py-3 resize-none" 
+                           placeholder="Ex: Contract Terminated..." 
+                           value={deleteReason} 
+                           onChange={e => setDeleteReason(e.target.value)}
+                        />
+                    </div>
+                    <div className="flex gap-3 pt-2">
+                       <button onClick={() => setDeletingUser(null)} className="flex-1 sf-btn-secondary">Cancel</button>
+                       <button onClick={handleDeleteUser} className="flex-1 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold uppercase py-3 transition-all shadow-lg shadow-red-100">Purge Unit</button>
+                    </div>
+                 </div>
+              </div>
            </div>
         </div>
       )}

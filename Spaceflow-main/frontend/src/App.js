@@ -3,6 +3,7 @@ import "@/App.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "sonner";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import { ThemeProvider } from "./context/ThemeContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "./components/Layout";
 
@@ -40,91 +41,93 @@ function App() {
   return (
     <div className="App">
       <BrowserRouter>
-        <AuthProvider>
-          <Toaster position="top-right" richColors />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route
-              element={
-                <ProtectedRoute>
-                  <Layout />
-                </ProtectedRoute>
-              }
-            >
-              <Route path="dashboard" element={<HomeRedirect />} />
-              <Route path="browse" element={<BrowseResources />} />
-              <Route path="book/:resourceId" element={<BookingForm />} />
-              <Route path="bookings" element={<MyBookings />} />
-              <Route path="bookings/:id" element={<BookingDetail />} />
-              <Route path="calendar" element={<CalendarView />} />
-              <Route path="floor-map" element={<FloorMap />} />
-              <Route path="checkin" element={<CheckIn />} />
-              <Route path="profile" element={<EmployeeProfile />} />
-              <Route path="notifications" element={<NotificationsPanel />} />
-              <Route path="resource/:resourceId/calendar" element={<ResourceCalendar />} />
+        <ThemeProvider>
+          <AuthProvider>
+            <Toaster position="top-right" richColors />
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route
+                element={
+                  <ProtectedRoute>
+                    <Layout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route path="dashboard" element={<HomeRedirect />} />
+                <Route path="browse" element={<BrowseResources />} />
+                <Route path="book/:resourceId" element={<BookingForm />} />
+                <Route path="bookings" element={<MyBookings />} />
+                <Route path="bookings/:id" element={<BookingDetail />} />
+                <Route path="calendar" element={<CalendarView />} />
+                <Route path="floor-map" element={<FloorMap />} />
+                <Route path="checkin" element={<CheckIn />} />
+                <Route path="profile" element={<EmployeeProfile />} />
+                <Route path="notifications" element={<NotificationsPanel />} />
+                <Route path="resource/:resourceId/calendar" element={<ResourceCalendar />} />
 
-              <Route
-                path="manager/approvals"
-                element={
-                  <ProtectedRoute roles={["manager", "admin"]}>
-                    <ApprovalQueue />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="manager/team-calendar"
-                element={
-                  <ProtectedRoute roles={["manager", "admin"]}>
-                    <TeamCalendar />
-                  </ProtectedRoute>
-                }
-              />
+                <Route
+                  path="manager/approvals"
+                  element={
+                    <ProtectedRoute roles={["manager", "admin"]}>
+                      <ApprovalQueue />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="manager/team-calendar"
+                  element={
+                    <ProtectedRoute roles={["manager", "admin"]}>
+                      <TeamCalendar />
+                    </ProtectedRoute>
+                  }
+                />
 
-              <Route
-                path="admin"
-                element={
-                  <ProtectedRoute roles={["admin"]}>
-                    <AdminDashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="admin/resources"
-                element={
-                  <ProtectedRoute roles={["admin"]}>
-                    <ResourceManagement />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="admin/policies"
-                element={
-                  <ProtectedRoute roles={["admin"]}>
-                    <PolicyConfiguration />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="admin/bookings"
-                element={
-                  <ProtectedRoute roles={["admin"]}>
-                    <AllBookings />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="admin/reports"
-                element={
-                  <ProtectedRoute roles={["admin"]}>
-                    <ReportsAnalytics />
-                  </ProtectedRoute>
-                }
-              />
-            </Route>
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </AuthProvider>
+                <Route
+                  path="admin"
+                  element={
+                    <ProtectedRoute roles={["admin"]}>
+                      <AdminDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="admin/resources"
+                  element={
+                    <ProtectedRoute roles={["admin"]}>
+                      <ResourceManagement />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="admin/policies"
+                  element={
+                    <ProtectedRoute roles={["admin"]}>
+                      <PolicyConfiguration />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="admin/bookings"
+                  element={
+                    <ProtectedRoute roles={["admin"]}>
+                      <AllBookings />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="admin/reports"
+                  element={
+                    <ProtectedRoute roles={["admin"]}>
+                      <ReportsAnalytics />
+                    </ProtectedRoute>
+                  }
+                />
+              </Route>
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </AuthProvider>
+        </ThemeProvider>
       </BrowserRouter>
     </div>
   );

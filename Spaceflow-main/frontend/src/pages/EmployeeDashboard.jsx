@@ -2,16 +2,19 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { api, BACKEND_URL } from "../lib/api";
 import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 import BookingStateBadge from "../components/BookingStateBadge";
 import { 
   Plus, ArrowRight, QrCode, CalendarDays, Clock, 
   MapPin, Users, Zap, TrendingUp, Activity, CheckCircle, 
-  Loader2, Star, Search, Filter, Box, MessageSquare, X, Send
+  Loader2, Star, Search, Filter, Box, MessageSquare, X, Send,
+  ChevronRight, ArrowUpRight
 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function EmployeeDashboard() {
   const { user } = useAuth();
+  const { theme } = useTheme();
   const [bookings, setBookings] = useState([]);
   const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -51,90 +54,113 @@ export default function EmployeeDashboard() {
         booking_id: feedbackBooking.id,
         content: feedbackContent
       });
-      toast.success("Feedback submitted to management");
+      toast.success("Intelligence report dispatched");
       setFeedbackBooking(null);
       setFeedbackContent("");
     } catch (err) {
-      toast.error(err.response?.data?.detail || "Failed to submit feedback");
+      toast.error(err.response?.data?.detail || "Report failed");
     } finally {
       setSubmittingFeedback(false);
     }
   };
 
   if (loading) return (
-    <div className="flex items-center justify-center h-64">
-      <Loader2 className="animate-spin w-8 h-8 text-indigo-600" />
+    <div className="flex items-center justify-center h-full">
+      <Loader2 className="animate-spin w-12 h-12 text-primary/20" />
     </div>
   );
 
   return (
-    <div className="space-y-8 animate-fade-in-up">
+    <div className="space-y-10 animate-fade-in-up">
       
-      {/* ── Welcome Header ── */}
-      <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
-         <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
-            <Box size={200} />
+      {/* ── Dashboard Identity Header ── */}
+      <div className="relative overflow-hidden p-10 rounded-[32px] border border-border/40 bg-sf-bg-soft shadow-2xl">
+         {/* Ambient media depth */}
+         <div className="absolute top-0 right-0 w-1/2 h-full opacity-10 pointer-events-none grayscale">
+            <video autoPlay muted loop className="w-full h-full object-cover">
+               <source src="/videos/landingdb.mp4" type="video/mp4" />
+            </video>
+            <div className="absolute inset-0 bg-gradient-to-l from-sf-bg-soft via-transparent to-sf-bg-soft" />
          </div>
-         <div className="relative z-10 text-center md:text-left">
-            <div className="text-xs font-bold text-indigo-600 uppercase tracking-[0.2em] mb-2">Spaceflow Portal</div>
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-2">Welcome back, {user?.name.split(" ")[0]}</h1>
-            <p className="text-slate-500 text-sm max-w-md leading-relaxed">
-               You have {upcoming.length} sessions scheduled for the upcoming interval. Your performance index is currently at <span className="font-bold text-slate-900">{reliabilityScore}%</span>.
-            </p>
-            <div className="flex flex-wrap items-center gap-3 mt-6 justify-center md:justify-start">
-               <Link to="/browse" className="sf-btn-primary py-2 px-5 text-xs h-auto">
-                  <Plus size={14} className="mr-2" /> New Reservation
-               </Link>
-               <Link to="/checkin" className="sf-btn-secondary py-2 px-5 text-xs h-auto bg-slate-50 border-none shadow-none">
-                  <QrCode size={14} className="mr-2" /> Express Check-in
-               </Link>
+
+         <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10">
+            <div className="space-y-6 text-center lg:text-left">
+               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-[10px] font-black uppercase tracking-[0.2em] text-primary">
+                  Corporate Identity Node
+               </div>
+               <div className="space-y-2">
+                  <h1 className="text-4xl md:text-5xl font-black tracking-tight">Welcome, {user?.name.split(" ")[0]}</h1>
+                  <p className="text-muted-foreground font-medium max-w-lg leading-relaxed">
+                     Your reliability index is <span className="text-foreground font-bold">{reliabilityScore}%</span>. 
+                     You have <span className="text-foreground font-bold">{upcoming.length} upcoming sessions</span> in the current interval.
+                  </p>
+               </div>
+               <div className="flex flex-wrap items-center gap-4 justify-center lg:justify-start">
+                  <Link to="/browse" className="sf-btn-primary px-8 py-3 text-xs">
+                     <Plus size={16} /> New Asset Request
+                  </Link>
+                  <Link to="/checkin" className="sf-btn-secondary px-8 py-3 text-xs">
+                     <QrCode size={16} /> Identity Check-in
+                  </Link>
+               </div>
             </div>
-         </div>
-         
-         <div className="flex items-center gap-12 bg-slate-50 px-8 py-6 rounded-2xl border border-slate-100 relative z-10">
-            <div className="text-center">
-               <div className="text-3xl font-bold text-slate-900">{reliabilityScore}%</div>
-               <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Reliability</div>
-            </div>
-            <div className="h-10 w-px bg-slate-200" />
-            <div className="text-center">
-               <div className="text-3xl font-bold text-slate-900">{completed.length}</div>
-               <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Sessions</div>
+
+            <div className="flex items-center gap-10 bg-accent/40 backdrop-blur-md p-8 rounded-3xl border border-border/40 shadow-xl">
+               <div className="text-center space-y-1">
+                  <div className="text-4xl font-serif italic text-foreground leading-none">{reliabilityScore}%</div>
+                  <div className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Reliability</div>
+               </div>
+               <div className="h-12 w-[1px] bg-border/40" />
+               <div className="text-center space-y-1">
+                  <div className="text-4xl font-serif italic text-foreground leading-none">{completed.length}</div>
+                  <div className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Utilized</div>
+               </div>
             </div>
          </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
         
-        {/* Main Content: Upcoming & Completed */}
+        {/* Main Content Pane */}
         <div className="lg:col-span-2 space-y-12">
            
-           {/* Upcoming Schedule */}
+           {/* Upcoming Operations */}
            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                 <h3 className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
-                    <CalendarDays size={14} /> Upcoming Operations
+              <div className="flex items-center justify-between px-2">
+                 <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground flex items-center gap-2">
+                    <CalendarDays size={14} className="text-primary" /> Upcoming Operations
                  </h3>
-                 <Link to="/bookings" className="text-[10px] font-bold text-indigo-600 hover:underline">Full Audit Log</Link>
+                 <Link to="/bookings" className="text-[10px] font-black text-primary hover:underline flex items-center gap-1">
+                    Audit Log <ChevronRight size={12} />
+                 </Link>
               </div>
 
               {upcoming.length === 0 ? (
-                <div className="sf-card py-16 flex flex-col items-center justify-center text-center px-8 border-dashed border-2">
-                   <div className="font-bold text-slate-900">No Upcoming Sessions</div>
-                   <p className="text-slate-500 text-sm mt-1 max-w-xs">Your schedule is currently clear.</p>
+                <div className="sf-card group relative h-[300px] flex flex-col items-center justify-center text-center p-12 border-dashed overflow-hidden">
+                   <video autoPlay muted loop className="absolute inset-0 w-full h-full object-cover opacity-5 grayscale group-hover:opacity-10 transition-opacity duration-500">
+                      <source src="/videos/landingdb.mp4" type="video/mp4" />
+                   </video>
+                   <div className="relative z-10 space-y-4">
+                      <div className="h-16 w-16 bg-accent rounded-2xl flex items-center justify-center mx-auto mb-4 border border-border/50">
+                         <Activity size={24} className="text-muted-foreground" />
+                      </div>
+                      <div className="font-bold text-lg">No Active Sessions</div>
+                      <p className="text-muted-foreground text-sm max-w-xs mx-auto">Your operational schedule is currently clear. Request an asset to begin.</p>
+                      <Link to="/browse" className="sf-btn-primary py-2 px-6 text-[10px] uppercase tracking-widest mt-4">Browse Inventory</Link>
+                   </div>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {upcoming.slice(0, 3).map(b => (
-                    <Link key={b.id} to={`/bookings/${b.id}`} className="sf-card p-5 group flex items-center gap-6 transition-all hover:border-indigo-200">
-                       <div className="flex flex-col items-center justify-center h-14 w-14 bg-slate-50 rounded-xl border border-slate-100 group-hover:bg-indigo-50 group-hover:border-indigo-100 transition-colors">
-                          <div className="text-[10px] font-bold text-slate-400 group-hover:text-indigo-400 uppercase tracking-tighter">{new Date(b.start_time).toLocaleDateString(undefined, {month:'short'})}</div>
-                          <div className="text-xl font-bold text-slate-900 group-hover:text-indigo-600 leading-none mt-1">{new Date(b.start_time).getDate()}</div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {upcoming.slice(0, 4).map(b => (
+                    <Link key={b.id} to={`/bookings/${b.id}`} className="sf-card p-6 group flex items-center gap-6 hover:border-primary/40">
+                       <div className="flex flex-col items-center justify-center h-16 w-16 bg-accent rounded-2xl border border-border/60 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500 group-hover:shadow-xl group-hover:shadow-primary/20">
+                          <div className="text-[9px] font-black uppercase tracking-tighter opacity-60">{new Date(b.start_time).toLocaleDateString(undefined, {month:'short'})}</div>
+                          <div className="text-2xl font-serif italic leading-none mt-1">{new Date(b.start_time).getDate()}</div>
                        </div>
-                       <div className="flex-1 min-w-0">
-                          <div className="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors truncate">{b.resource_name}</div>
-                          <div className="text-xs text-slate-500 flex items-center gap-1.5 mt-1">
-                             <Clock size={12} className="text-slate-300" /> 
+                       <div className="flex-1 min-w-0 space-y-1">
+                          <div className="font-bold text-foreground group-hover:text-primary transition-colors truncate">{b.resource_name}</div>
+                          <div className="text-xs text-muted-foreground flex items-center gap-1.5 font-medium">
+                             <Clock size={12} className="text-muted-foreground/40" /> 
                              {new Date(b.start_time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} 
                           </div>
                        </div>
@@ -145,28 +171,28 @@ export default function EmployeeDashboard() {
               )}
            </div>
 
-           {/* Completed - Feedback Option */}
+           {/* Performance Audit (Recently Completed) */}
            <div className="space-y-6">
-              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
-                 <CheckCircle size={14} className="text-emerald-500" /> Recently Completed
+              <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground flex items-center gap-2 px-2">
+                 <CheckCircle size={14} className="text-emerald-500" /> Operational History
               </h3>
               <div className="space-y-4">
                  {completed.slice(0, 3).map(b => (
-                   <div key={b.id} className="sf-card p-5 flex items-center justify-between group">
-                      <div className="flex items-center gap-4">
-                         <div className="h-10 w-10 bg-slate-50 rounded-lg flex items-center justify-center border border-slate-100">
-                            <Box size={18} className="text-slate-400" />
+                   <div key={b.id} className="sf-card p-6 flex items-center justify-between group bg-sf-bg-soft/40">
+                      <div className="flex items-center gap-6">
+                         <div className="h-12 w-12 bg-accent rounded-xl flex items-center justify-center border border-border/40">
+                            <Box size={20} className="text-muted-foreground" />
                          </div>
-                         <div>
-                            <div className="font-bold text-slate-900">{b.resource_name}</div>
-                            <div className="text-xs text-slate-500">{new Date(b.end_time).toLocaleDateString(undefined, {month:'short', day:'numeric'})} · {new Date(b.end_time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
+                         <div className="space-y-1">
+                            <div className="font-bold text-foreground">{b.resource_name}</div>
+                            <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{new Date(b.end_time).toLocaleDateString(undefined, {month:'short', day:'numeric'})} · {new Date(b.end_time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
                          </div>
                       </div>
                       <button 
                         onClick={() => setFeedbackBooking(b)}
-                        className="flex items-center gap-2 px-4 py-2 bg-slate-50 hover:bg-indigo-50 text-slate-600 hover:text-indigo-600 rounded-lg text-xs font-bold transition-all border border-transparent hover:border-indigo-100"
+                        className="sf-btn-secondary py-2 px-4 text-[10px] uppercase tracking-widest hover:border-primary/30"
                       >
-                         <MessageSquare size={14} /> Report Issue / Feedback
+                         <MessageSquare size={14} className="mr-2" /> Report Conflict
                       </button>
                    </div>
                  ))}
@@ -174,79 +200,86 @@ export default function EmployeeDashboard() {
            </div>
         </div>
 
-        {/* Right Sidebar: Quick Actions & Featured */}
-        <div className="space-y-8">
-           <div className="space-y-4">
-              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
-                 <Zap size={14} className="text-amber-500" /> Fast Inventory
+        {/* Intelligence Sidebar */}
+        <div className="space-y-10">
+           {/* Quick Access Inventory */}
+           <div className="space-y-6">
+              <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground flex items-center gap-2 px-2">
+                 <Zap size={14} className="text-amber-500" /> Quick Provisioning
               </h3>
-              <div className="sf-card p-2">
-                 <div className="divide-y divide-slate-100">
-                    {resources.filter(r=>r.active).slice(0, 3).map(r => (
-                      <Link key={r.id} to={`/book/${r.id}`} className="p-3 flex items-center gap-3 group hover:bg-slate-50 rounded-lg transition-colors">
-                         <div className="h-10 w-10 bg-slate-100 rounded-lg overflow-hidden border border-slate-200">
+              <div className="sf-card p-2 bg-sf-bg-soft/60">
+                 <div className="divide-y divide-border/20">
+                    {resources.filter(r=>r.active).slice(0, 4).map(r => (
+                      <Link key={r.id} to={`/book/${r.id}`} className="p-4 flex items-center gap-4 group hover:bg-accent/40 rounded-2xl transition-all">
+                         <div className="h-12 w-12 rounded-xl overflow-hidden border border-border/50 bg-black">
                             {r.image_url 
-                               ? <img src={getResourceImg(r)} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="" />
-                               : <div className="w-full h-full flex items-center justify-center text-xs opacity-20">🏢</div>
+                               ? <img src={getResourceImg(r)} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-80" alt="" />
+                               : <div className="w-full h-full flex items-center justify-center text-lg opacity-20 grayscale">🏢</div>
                             }
                          </div>
-                         <div className="flex-1 min-w-0">
-                            <div className="text-sm font-bold text-slate-900 truncate group-hover:text-indigo-600">{r.name}</div>
-                            <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest truncate">{r.type}</div>
+                         <div className="flex-1 min-w-0 space-y-0.5">
+                            <div className="text-sm font-bold text-foreground group-hover:text-primary transition-colors truncate">{r.name}</div>
+                            <div className="text-[9px] text-muted-foreground font-black uppercase tracking-widest truncate">{r.type}</div>
                          </div>
-                         <Plus size={14} className="text-slate-300 group-hover:text-indigo-600 transition-colors" />
+                         <ArrowUpRight size={16} className="text-muted-foreground/30 group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
                       </Link>
                     ))}
                  </div>
               </div>
            </div>
 
-           <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-              <div className="h-10 w-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center mb-4">
-                 <Star size={20} />
+           {/* High-End Empty State / Tip Card */}
+           <div className="relative overflow-hidden rounded-[32px] p-8 border border-border/40 bg-background shadow-xl">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-[50px] -z-10" />
+              <div className="h-12 w-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mb-6 border border-primary/20">
+                 <Star size={24} />
               </div>
-              <div className="text-sm font-bold text-slate-900 uppercase tracking-widest mb-2">Spaceflow Tip</div>
-              <p className="text-xs text-slate-500 leading-relaxed italic">
-                 "Check-in within 15 minutes of your session start time to maintain a high Reliability Index."
+              <div className="text-xs font-black text-foreground uppercase tracking-[0.2em] mb-3">Protocol Optimization</div>
+              <p className="text-sm text-muted-foreground leading-relaxed italic font-medium">
+                 "Check-in within 15 minutes of your session window to maintain peak operational reliability."
               </p>
+              <div className="mt-8 pt-6 border-t border-border/40 flex items-center gap-3">
+                 <div className="h-2 w-2 bg-primary rounded-full animate-pulse" />
+                 <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Governance Engine Active</span>
+              </div>
            </div>
         </div>
 
       </div>
 
-      {/* ── Feedback Modal ── */}
+      {/* ── Intelligence Report Modal ── */}
       {feedbackBooking && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-8">
-           <div className="sf-card w-full max-w-lg p-8 relative shadow-2xl animate-fade-in-up">
-              <button onClick={() => setFeedbackBooking(null)} className="absolute top-6 right-6 text-slate-400 hover:text-slate-900 transition-colors">
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-xl z-[100] flex items-center justify-center p-8">
+           <div className="sf-card w-full max-w-lg p-10 relative shadow-2xl animate-fade-in-up">
+              <button onClick={() => setFeedbackBooking(null)} className="absolute top-8 right-8 text-muted-foreground hover:text-foreground transition-all p-2 hover:bg-accent rounded-xl">
                  <X size={20} />
               </button>
               
-              <div className="mb-8">
-                 <div className="sf-section-label mb-3">Resource Insight</div>
-                 <h2 className="text-2xl font-bold text-slate-900">Report an Issue</h2>
-                 <p className="text-slate-500 text-sm mt-1">Providing feedback for <span className="text-slate-900 font-semibold">{feedbackBooking.resource_name}</span> session.</p>
+              <div className="mb-10 space-y-4">
+                 <div className="sf-badge !bg-primary/10 !text-primary !border-primary/20">Resource Incident</div>
+                 <h2 className="text-3xl font-bold tracking-tight">Report Intelligence Conflict</h2>
+                 <p className="text-muted-foreground text-sm font-medium">Reporting issue for <span className="text-foreground font-bold">{feedbackBooking.resource_name}</span> session.</p>
               </div>
 
-              <form onSubmit={handleSubmitFeedback} className="space-y-6">
-                 <div className="space-y-2">
+              <form onSubmit={handleSubmitFeedback} className="space-y-8">
+                 <div className="space-y-3">
                     <label className="sf-label">Detailed Observations</label>
                     <textarea 
                        required
-                       rows={4}
+                       rows={5}
                        className="sf-input py-4 resize-none"
-                       placeholder="e.g., Projector bulb flickering, room temperature was too high, or equipment missing..."
+                       placeholder="Describe the discrepancy or resource failure..."
                        value={feedbackContent}
                        onChange={e => setFeedbackContent(e.target.value)}
                     />
                  </div>
 
-                 <div className="pt-6 border-t border-slate-100 flex gap-4">
-                    <button type="button" onClick={() => setFeedbackBooking(null)} className="sf-btn-secondary flex-1">
+                 <div className="pt-6 border-t border-border/40 flex gap-4">
+                    <button type="button" onClick={() => setFeedbackBooking(null)} className="sf-btn-secondary flex-1 py-4">
                        Discard
                     </button>
-                    <button type="submit" disabled={submittingFeedback} className="sf-btn-primary flex-[2]">
-                       {submittingFeedback ? <Loader2 size={18} className="animate-spin" /> : <><Send size={16} className="mr-2" /> Submit to Management</>}
+                    <button type="submit" disabled={submittingFeedback} className="sf-btn-primary flex-[2] py-4">
+                       {submittingFeedback ? <Loader2 size={18} className="animate-spin" /> : <><Send size={16} /> Dispatch Report</>}
                     </button>
                  </div>
               </form>
