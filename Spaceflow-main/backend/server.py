@@ -31,26 +31,33 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(level
 logger = logging.getLogger("app")
 
 
+# BYPASS SETTINGS (Set to False to use real database/auth)
+BYPASS_DATABASE = True
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Create tables
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    # Seed initial data
-    async with AsyncSessionLocal() as db:
-        await seed_data(db)
-    # Start scheduler
-    app.state.scheduler = start_scheduler()
-    logger.info("App ready.")
+    if not BYPASS_DATABASE:
+        # Create tables
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        # Seed initial data
+        async with AsyncSessionLocal() as db:
+            await seed_data(db)
+        # Start scheduler
+        app.state.scheduler = start_scheduler()
+        logger.info("App ready.")
+    else:
+        logger.info("BYPASS MODE: Database and Scheduler skipped.")
     yield
-    try:
-        app.state.scheduler.shutdown(wait=False)
-    except Exception:
-        pass
+    if not BYPASS_DATABASE:
+        try:
+            app.state.scheduler.shutdown(wait=False)
+        except Exception:
+            pass
     await engine.dispose()
 
 
-app = FastAPI(title="Smart Resource Booking", lifespan=lifespan)
+app = FastAPI(title="Smart Resource Booking (Bypass Mode)", lifespan=lifespan)
 
 # CORS configuration — Must be before routers
 origins = os.environ.get("CORS_ORIGINS", "http://localhost:3000,http://localhost:3001,http://localhost:5173").split(",")
@@ -64,26 +71,61 @@ app.add_middleware(
 
 api_router = APIRouter(prefix="/api")
 
+if BYPASS_DATABASE:
+    @api_router.post("/auth/login")
+    async def mock_login():
+        return {
+            "access_token": "mock_token",
+            "token_type": "bearer",
+            "user": {
+                "id": 1,
+                "email": "admin@example.com",
+                "name": "Mock Admin",
+                "is_admin": True,
+                "role": "admin"
+            }
+        }
 
-@api_router.get("/")
-async def root():
-    return {"message": "Smart Resource Booking API", "status": "ok"}
+    @api_router.post("/auth/register")
+    async def mock_register():
+        return {"message": "User created (Mock)"}
 
+    @api_router.get("/auth/me")
+    async def mock_me():
+        return {
+            "id": 1,
+            "email": "admin@example.com",
+            "name": "Mock Admin",
+            "is_admin": True,
+            "role": "admin"
+        }
 
-@api_router.get("/health")
-async def health():
-    return {"ok": True}
+    @api_router.get("/resources")
+    async def mock_resources():
+        return [
+            {"id": 1, "name": "Conference Room A", "type": "room", "capacity": 10},
+            {"id": 2, "name": "Projector B", "type": "equipment", "capacity": 1}
+        ]
 
+    @api_router.get("/bookings")
+    async def mock_bookings():
+        return []
 
-api_router.include_router(auth_router)
-api_router.include_router(resources_router)
-api_router.include_router(bookings_router)
-api_router.include_router(notifications_router)
-api_router.include_router(maintenance_router)
-api_router.include_router(analytics_router)
-api_router.include_router(calendar_router)
-api_router.include_router(users_router)
-api_router.include_router(feedback_router)
+    @api_router.get("/analytics/overview")
+    async def mock_analytics():
+        return {"total_bookings": 10, "active_resources": 5}
+    
+    # Add other mock routes as needed...
+else:
+    api_router.include_router(auth_router)
+    api_router.include_router(resources_router)
+    api_router.include_router(bookings_router)
+    api_router.include_router(notifications_router)
+    api_router.include_router(maintenance_router)
+    api_router.include_router(analytics_router)
+    api_router.include_router(calendar_router)
+    api_router.include_router(users_router)
+    api_router.include_router(feedback_router)
 
 app.include_router(api_router)
 
