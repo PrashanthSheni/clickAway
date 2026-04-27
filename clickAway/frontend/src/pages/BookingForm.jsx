@@ -135,8 +135,8 @@ export default function BookingForm() {
         <ArrowLeft size={14} /> Back
       </button>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <form onSubmit={onSubmit} className="lg:col-span-2 bg-white rounded-lg border border-slate-200 p-6 space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <form onSubmit={onSubmit} className="lg:col-span-2 sf-card p-10 space-y-10">
           <div className="flex flex-col sm:flex-row gap-4">
             {resource.image_url && (
               <div className="w-full sm:w-32 h-32 rounded-lg bg-slate-100 overflow-hidden flex-shrink-0 border border-slate-200">
@@ -148,46 +148,51 @@ export default function BookingForm() {
               </div>
             )}
             <div>
-              <div className="text-[10px] uppercase tracking-[0.3em] font-bold text-blue-600 mb-1">Book</div>
-              <h2 className="text-3xl font-extrabold tracking-tight text-slate-900">{resource.name}</h2>
-              <div className="text-sm text-slate-600 mt-1">
-                {resource.type.toUpperCase()} · Floor {resource.floor} · Capacity {resource.capacity}
+              <div className="flex items-center gap-3 mb-2">
+                <div className="sf-badge !bg-primary/10 !text-primary !border-primary/20">Resource Reservation</div>
+                <div className={`sf-badge ${resource.requires_approval ? '!bg-amber-500/10 !text-amber-600 !border-amber-500/20' : '!bg-emerald-500/10 !text-emerald-600 !border-emerald-500/20'}`}>
+                  {resource.requires_approval ? 'Authorization Required' : 'Instant Approval'}
+                </div>
+              </div>
+              <h2 className="text-4xl font-black tracking-tight text-foreground">{resource.name}</h2>
+              <div className="text-xs font-bold text-muted-foreground uppercase tracking-[0.2em] mt-2">
+                {resource.type} // Floor {resource.floor} // Capacity {resource.capacity}
               </div>
             </div>
           </div>
 
-          <div>
-            <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">
-              Title <span className="text-red-500">*</span>
+          <div className="space-y-4">
+            <label className="sf-label">
+              Operational Title <span className="text-primary">*</span>
             </label>
             <input
               data-testid="booking-title-input"
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
               placeholder="Design review, client sync, deep work…"
-              className="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="sf-input"
             />
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">Start</label>
+          <div className="grid grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <label className="sf-label">Commencement</label>
               <input
                 type="datetime-local"
                 data-testid="booking-start-input"
                 value={form.start_time}
                 onChange={(e) => setForm({ ...form, start_time: e.target.value })}
-                className="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="sf-input"
                 required
               />
             </div>
-            <div>
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">End</label>
+            <div className="space-y-4">
+              <label className="sf-label">Termination</label>
               <input
                 type="datetime-local"
                 data-testid="booking-end-input"
                 value={form.end_time}
                 onChange={(e) => setForm({ ...form, end_time: e.target.value })}
-                className="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="sf-input"
                 required
               />
             </div>
@@ -205,27 +210,32 @@ export default function BookingForm() {
               />
             </div>
           )}
-          <div>
-            <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">Notes</label>
+          <div className="space-y-4">
+            <label className="sf-label">Intelligence Notes</label>
             <textarea
               data-testid="booking-notes-input"
               value={form.notes}
               onChange={(e) => setForm({ ...form, notes: e.target.value })}
-              rows={3}
-              className="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              rows={4}
+              className="sf-input min-h-[120px] resize-none"
+              placeholder="Provide additional context for this reservation..."
             />
           </div>
 
           {/* Recurring */}
-          <div className="pt-3 border-t border-slate-200">
-            <label className="inline-flex items-center gap-2 text-sm font-semibold text-slate-900">
-              <input
-                type="checkbox"
-                data-testid="booking-recurring-toggle"
-                checked={recurring.enabled}
-                onChange={(e) => setRecurring((r) => ({ ...r, enabled: e.target.checked }))}
-              />
-              Recurring booking
+          <div className="pt-8 border-t border-border/40">
+            <label className="flex items-center gap-3 cursor-pointer group">
+              <div className="relative flex items-center justify-center">
+                <input
+                  type="checkbox"
+                  data-testid="booking-recurring-toggle"
+                  className="peer h-5 w-5 appearance-none rounded-md border border-border bg-background checked:bg-primary checked:border-primary transition-all cursor-pointer"
+                  checked={recurring.enabled}
+                  onChange={(e) => setRecurring((r) => ({ ...r, enabled: e.target.checked }))}
+                />
+                <CheckCircle2 className="absolute text-primary-foreground opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" size={14} />
+              </div>
+              <span className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">Activate Recurrence Pattern</span>
             </label>
             {recurring.enabled && (
               <div className="mt-3 grid grid-cols-2 gap-3" data-testid="booking-recurring-fields">
@@ -289,19 +299,19 @@ export default function BookingForm() {
             type="submit"
             data-testid="booking-submit-btn"
             disabled={!canSubmit}
-            className="bg-blue-600 text-white font-semibold rounded-md px-4 py-2.5 hover:bg-blue-700 transition-colors disabled:opacity-60 inline-flex items-center gap-2"
+            className="sf-btn-primary w-full py-4 text-lg shadow-xl shadow-primary/20"
           >
-            {submitting && <Loader2 size={16} className="animate-spin" />}
+            {submitting && <Loader2 size={20} className="animate-spin" />}
             {recurring.enabled
-              ? `Create series (${recurring.occurrences}×)`
+              ? `Initialize Series (${recurring.occurrences}×)`
               : validation?.auto_approve
-              ? "Confirm booking (auto-approve)"
-              : "Submit for approval"}
+              ? "Finalize Reservation"
+              : "Dispatch for Authorization"}
           </button>
         </form>
 
         {/* Live validation panel */}
-        <div className="bg-white rounded-lg border border-slate-200 p-5 h-fit sticky top-24">
+        <div className="sf-card p-8 h-fit sticky top-24 bg-sf-bg-soft/50 backdrop-blur-xl">
           <div className="flex items-center justify-between mb-3">
             <div className="text-[10px] uppercase tracking-widest font-bold text-slate-500">Live validation</div>
             {validating && <Loader2 size={14} className="animate-spin text-slate-400" />}

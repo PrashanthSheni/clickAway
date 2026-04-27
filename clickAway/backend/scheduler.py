@@ -23,7 +23,7 @@ def _fmt_when(b: Booking) -> str:
 
 CHECK_IN_EARLY_MIN = 10
 WARNING_GRACE_MIN = 10  # warning at +10 after start
-NO_SHOW_GRACE_MIN = 20  # no-show at +20 after start
+NO_SHOW_GRACE_MIN = 15  # auto-cancel at +15 after start (user gets 5 min warning)
 APPROVAL_ESCALATION_HOURS = 24
 
 
@@ -152,6 +152,49 @@ async def job_escalate_approvals():
             await db.commit()
 
 
+async def job_auto_send_codes():
+    async with AsyncSessionLocal() as db:
+        now = datetime.now(timezone.utc)
+        # Find bookings starting in the next 10-11 minutes that are approved but have no code yet
+        lower = now + timedelta(minutes=9)
+        upper = now + timedelta(minutes=11)
+        
+        res = await db.execute(
+            select(Booking).where(
+                Booking.state == BookingState.approved,
+                Booking.start_time >= lower,
+                Booking.start_time <= upper,
+                Booking.check_in_code == "",
+            )
+        )
+        bookings = list(res.scalars().all())
+        from services import gen_check_in_code
+        
+        for b in bookings:
+            b.check_in_code = gen_check_in_code()
+            db.add(BookingEvent(
+                booking_id=b.id, event_type="code_generated",
+                from_state=b.state.value, to_state=b.state.value,
+                message="Auto-generated code dispatched 10min before start.",
+            ))
+            
+            user = (await db.execute(select(User).where(User.id == b.user_id))).scalar_one_or_none()
+            resource = (await db.execute(select(Resource).where(Resource.id == b.resource_id))).scalar_one_or_none()
+            
+            if user and resource:
+                subject, html = email_service.tpl_check_in_code_delivered(user.name, resource.name, b.check_in_code)
+                await notify(
+                    db, b.user_id, NotificationType.booking_approved,
+                    "Your check-in code is ready",
+                    f"Check-in code for {resource.name}: {b.check_in_code}",
+                    link=f"/bookings/{b.id}",
+                    email_subject=subject, email_html=html,
+                )
+        
+        if bookings:
+            await db.commit()
+
+
 def start_scheduler():
     from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
@@ -159,6 +202,7 @@ def start_scheduler():
     scheduler.add_job(job_no_show_warning, "interval", minutes=1, id="no_show_warning")
     scheduler.add_job(job_auto_no_show, "interval", minutes=1, id="auto_no_show")
     scheduler.add_job(job_complete_bookings, "interval", minutes=1, id="complete_bookings")
+    scheduler.add_job(job_auto_send_codes, "interval", minutes=1, id="auto_send_codes")
     scheduler.add_job(job_escalate_approvals, "interval", minutes=10, id="escalate_approvals")
     scheduler.start()
     return scheduler

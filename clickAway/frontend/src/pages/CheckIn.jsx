@@ -75,28 +75,28 @@ export default function CheckIn() {
   return (
     <div data-testid="checkin-page" className="space-y-6 max-w-2xl">
       <div>
-        <div className="text-[10px] uppercase tracking-[0.3em] font-bold text-blue-600 mb-1">Quick</div>
-        <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">QR Check-in</h1>
-        <p className="text-sm text-slate-600 mt-1">
-          Enter your 6-digit code. Or scan your QR at the resource kiosk.
+        <div className="sf-badge !bg-primary/10 !text-primary !border-primary/20 mb-2">Biometric / QR Access</div>
+        <h1 className="text-4xl font-black tracking-tight text-foreground">Session Identity</h1>
+        <p className="text-sm font-medium text-muted-foreground mt-2 leading-relaxed">
+          Authenticate your arrival. Enter your 6-digit security code or scan your unique QR at the resource kiosk.
         </p>
       </div>
 
       {bookings.length === 0 && (
-        <div className="bg-white border border-slate-200 rounded-lg p-8 text-center">
-          <div className="text-sm text-slate-500">No bookings in the next 2 hours. You're all set.</div>
+        <div className="sf-card p-12 text-center bg-sf-bg-soft/40 border-dashed">
+          <div className="text-sm font-medium text-muted-foreground italic">No active authorizations detected in the immediate window.</div>
         </div>
       )}
 
       {bookings.map((b) => (
-        <div key={b.id} className="bg-white rounded-lg border border-slate-200 p-5" data-testid={`checkin-card-${b.id}`}>
+        <div key={b.id} className="sf-card p-8 group hover:border-primary/30 transition-all" data-testid={`checkin-card-${b.id}`}>
           <div className="flex items-start justify-between">
-            <div>
-              <Link to={`/bookings/${b.id}`} className="text-lg font-bold text-slate-900 hover:text-blue-700">
+            <div className="space-y-1">
+              <Link to={`/bookings/${b.id}`} className="text-xl font-bold text-foreground hover:text-primary transition-colors">
                 {b.resource_name}
               </Link>
-              <div className="text-xs text-slate-500 mt-1">
-                {new Date(b.start_time).toLocaleString()} → {new Date(b.end_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+              <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+                {new Date(b.start_time).toLocaleString()} // {new Date(b.end_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
               </div>
             </div>
             <BookingStateBadge state={b.state} />
@@ -105,13 +105,52 @@ export default function CheckIn() {
             {(() => {
               const start = new Date(b.start_time);
               const isTenMinsBefore = now >= new Date(start.getTime() - 10 * 60 * 1000);
-              const hasCode = !!b.check_in_code;
+              
+              if (b.state === "checked_in") {
+                return (
+                  <div className="bg-green-500/10 border border-green-500/20 rounded-2xl p-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3 text-green-600 font-bold">
+                        <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                        Session in Progress
+                      </div>
+                      <button
+                        onClick={async () => {
+                          setBusy(true);
+                          try {
+                            await api.post(`/bookings/${b.id}/request-release`);
+                            toast.success("Release request sent to manager!");
+                            load();
+                          } catch (e) {
+                            toast.error(formatApiErrorDetail(e.response?.data?.detail) || "Request failed");
+                          } finally {
+                            setBusy(false);
+                          }
+                        }}
+                        disabled={busy}
+                        className="sf-btn-outline !text-xs !py-2 border-green-500/30 hover:bg-green-500/10 text-green-700"
+                      >
+                        Release Resource Early
+                      </button>
+                    </div>
+                  </div>
+                );
+              }
+
+              if (b.state === "release_pending") {
+                return (
+                  <div className="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-6 text-blue-600 font-medium flex items-center gap-3 italic">
+                    <Loader2 size={16} className="animate-spin opacity-50" />
+                    Waiting for manager to acknowledge early release...
+                  </div>
+                );
+              }
 
               if (!isTenMinsBefore) {
                 return (
-                  <div className="bg-blue-50 border border-blue-100 rounded-md p-3 text-sm text-blue-700 flex items-center gap-2">
-                    <Loader2 size={14} className="animate-spin" />
-                    Request approved. Check back 10 mins before your slot for the QR check-in code.
+                  <div className="bg-primary/5 border border-primary/10 rounded-2xl p-6 text-sm text-primary font-medium flex items-center gap-3">
+                    <Loader2 size={16} className="animate-spin opacity-50" />
+                    Identity verification window opens 10 minutes prior to commencement.
                   </div>
                 );
               }
@@ -121,15 +160,17 @@ export default function CheckIn() {
                   {activeQr?.id !== b.id ? (
                     <button
                       onClick={() => getQr(b.id)}
-                      className="w-full bg-slate-900 text-white font-semibold rounded-md px-4 py-2 hover:bg-slate-800"
+                      className="sf-btn-primary w-full py-4 text-sm uppercase tracking-widest font-black"
                     >
-                      Check In (Reveal QR)
+                      Reveal Security Identity
                     </button>
                   ) : (
-                    <div className="bg-slate-50 border border-slate-200 rounded-md p-4 text-center space-y-4">
-                      <div className="flex flex-col items-center gap-2">
-                        <img src={activeQr.qr_image} alt="Booking QR" className="w-32 h-32 border border-white shadow-sm" />
-                        <div className="text-[10px] uppercase font-bold text-slate-500">Scan at kiosk</div>
+                    <div className="bg-accent/40 backdrop-blur-xl border border-border/40 rounded-2xl p-8 text-center space-y-6">
+                      <div className="flex flex-col items-center gap-4">
+                        <div className="p-4 bg-white rounded-3xl shadow-2xl border-8 border-white/10">
+                          <img src={activeQr.qr_image} alt="Booking QR" className="w-40 h-40" />
+                        </div>
+                        <div className="text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground">Encryption Active // Scan at Terminal</div>
                       </div>
                       
                       {!b.check_in_code && !activeQr.code && (
@@ -152,22 +193,22 @@ export default function CheckIn() {
                               {activeQr.code}
                             </div>
                           )}
-                          <div className="flex items-center gap-2">
+                          <div className="flex flex-col sm:flex-row items-center gap-4">
                             <input
                               data-testid={`checkin-input-${b.id}`}
-                              placeholder="6-digit code"
+                              placeholder="CODE-X"
                               value={code}
                               onChange={(e) => setCode(e.target.value)}
                               maxLength={6}
-                              className="flex-1 border border-slate-300 rounded-md px-3 py-2 text-sm font-mono tracking-widest focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              className="sf-input text-center text-xl tracking-[0.3em] font-black h-14"
                             />
                             <button
                               data-testid={`checkin-submit-${b.id}`}
                               onClick={() => submit(b.id)}
                               disabled={busy || code.length !== 6}
-                              className="bg-blue-600 text-white font-semibold rounded-md px-4 py-2 hover:bg-blue-700 inline-flex items-center gap-2 disabled:opacity-60"
+                              className="sf-btn-primary h-14 px-8 whitespace-nowrap shadow-xl shadow-primary/20"
                             >
-                              {busy && <Loader2 size={14} className="animate-spin" />} Confirm Check In
+                              {busy ? <Loader2 size={18} className="animate-spin" /> : "Verify Identity"}
                             </button>
                           </div>
                         </div>

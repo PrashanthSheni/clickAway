@@ -7,7 +7,7 @@ import {
   Users, Calendar, Clock, ArrowRight, CheckCircle, 
   XCircle, AlertCircle, TrendingUp, Filter, Search, Loader2, UserPlus,
   ShieldAlert, Activity, ClipboardList, MessageSquare, ShieldCheck, X, Send, Zap,
-  Mail, Building, Shield, ArrowUpRight, BarChart
+  Mail, Building, Shield, ArrowUpRight, BarChart, Lock
 } from "lucide-react";
 import { toast } from "sonner";
 

@@ -147,15 +147,23 @@ export default function BrowseResources() {
                       </div>
                    </div>
 
-                   <div className="pt-6 border-t border-border/40 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                         <div className="h-2 w-2 bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-                         <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Provision Ready</span>
-                      </div>
-                      <span className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2">
-                         Initialize <ChevronRight size={14} />
-                      </span>
-                   </div>
+                    <div className="pt-6 border-t border-border/40 flex items-center justify-between">
+                       <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-2">
+                             <div className="h-2 w-2 bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                             <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Provision Ready</span>
+                          </div>
+                          <div className={`flex items-center gap-2 px-2 py-0.5 rounded-md border ${r.requires_approval ? 'bg-amber-500/5 border-amber-500/20 text-amber-600' : 'bg-emerald-500/5 border-emerald-500/20 text-emerald-600'}`}>
+                             <div className={`h-1 w-1 rounded-full ${r.requires_approval ? 'bg-amber-500' : 'bg-emerald-500'}`} />
+                             <span className="text-[9px] font-black uppercase tracking-widest">
+                                {r.requires_approval ? 'Authorization Required' : 'Instant Approval'}
+                             </span>
+                          </div>
+                       </div>
+                       <span className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2">
+                          Initialize <ChevronRight size={14} />
+                       </span>
+                    </div>
                 </div>
              </Link>
            ))}

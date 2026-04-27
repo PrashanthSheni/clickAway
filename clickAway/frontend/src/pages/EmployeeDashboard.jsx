@@ -218,7 +218,10 @@ export default function EmployeeDashboard() {
                             }
                          </div>
                          <div className="flex-1 min-w-0 space-y-0.5">
-                            <div className="text-sm font-bold text-foreground group-hover:text-primary transition-colors truncate">{r.name}</div>
+                            <div className="flex items-center gap-2">
+                               <div className="text-sm font-bold text-foreground group-hover:text-primary transition-colors truncate">{r.name}</div>
+                               <div className={`h-1.5 w-1.5 rounded-full ${r.requires_approval ? 'bg-amber-500 shadow-[0_0_5px_rgba(245,158,11,0.5)]' : 'bg-emerald-500 shadow-[0_0_5px_rgba(16,185,129,0.5)]'}`} title={r.requires_approval ? 'Approval Required' : 'Instant Approval'} />
+                            </div>
                             <div className="text-[9px] text-muted-foreground font-black uppercase tracking-widest truncate">{r.type}</div>
                          </div>
                          <ArrowUpRight size={16} className="text-muted-foreground/30 group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />

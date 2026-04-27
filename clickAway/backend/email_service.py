@@ -28,7 +28,8 @@ async def send_email(to: str, subject: str, html: str, text: str | None = None) 
     
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
-    msg["From"] = os.environ.get("SENDER_EMAIL", user)
+    # Gmail often rejects mail if the From address doesn't match the authenticated user
+    msg["From"] = os.environ.get("SENDER_EMAIL") or user
     msg["To"] = to
     
     if text:
@@ -98,6 +99,28 @@ def _wrap(title: str, body_html: str, cta_label: str | None = None, cta_url: str
 """
 
 
+def tpl_booking_requested(user_name: str, resource: str, when: str, link: str) -> tuple[str, str]:
+    subject = f"Booking request received — {resource}"
+    body = f"""Hi <strong>{user_name}</strong>,<br><br>
+        Your booking request for <strong>{resource}</strong> on <strong>{when}</strong> has been received and is currently <strong style="color:#2563EB;">pending approval</strong>.<br><br>
+        We'll notify you as soon as your manager or administrator reviews the request."""
+    
+    html = _wrap("Booking request received.", body, cta_label="View my bookings", cta_url=link)
+    return subject, html
+
+
+def tpl_early_release_request(user_name: str, resource: str, when: str) -> tuple[str, str]:
+    subject = f"Early Release Request — {resource}"
+    body = f"""Hi Manager,<br><br>
+        <strong>{user_name}</strong> has finished using <strong>{resource}</strong> earlier than scheduled.<br><br>
+        <strong>Original Booking:</strong> {when}<br><br>
+        If you approve, this resource will be immediately freed for other employees to book."""
+    
+    front_url = os.environ.get("FRONTEND_URL", "http://localhost:3000")
+    html = _wrap("Resource early release request.", body, cta_label="Review & Approve", cta_url=f"{front_url}/manager/approvals")
+    return subject, html
+
+
 def tpl_booking_approved(user_name: str, resource: str, when: str, code: str, link: str) -> tuple[str, str]:
     subject = f"Booking approved — {resource}"
     code_block = ""
@@ -119,7 +142,19 @@ def tpl_booking_approved(user_name: str, resource: str, when: str, code: str, li
         Your booking for <strong>{resource}</strong> on <strong>{when}</strong> is <strong style="color:#16A34A;">approved</strong>.<br><br>
         Please check your dashboard for the QR check-in code 10 minutes before your booked slot."""
 
-    html = _wrap("Your booking is approved.", body, cta_label="Open booking", cta_url=link)
+    front_url = os.environ.get("FRONTEND_URL", "")
+    html = _wrap("Your access code is ready.", body, cta_label="Check-in Now", cta_url=f"{front_url}/checkin")
+    return subject, html
+
+
+def tpl_check_in_confirmation(user_name: str, resource: str, when: str) -> tuple[str, str]:
+    subject = f"Check-in Successful — {resource}"
+    body = f"""Hi <strong>{user_name}</strong>,<br><br>
+        You have successfully checked in for <strong>{resource}</strong>.<br><br>
+        <strong>Session Start:</strong> {when}<br><br>
+        Enjoy your session!"""
+    
+    html = _wrap("Check-in confirmed.", body)
     return subject, html
 
 
@@ -164,16 +199,12 @@ def tpl_booking_rejected(user_name: str, resource: str, when: str, note: str, li
 
 
 def tpl_check_in_warning(user_name: str, resource: str, when: str, link: str) -> tuple[str, str]:
-    subject = f"Reminder: check in to {resource}"
-    html = _wrap(
-        "Please check in.",
-        f"""Hi <strong>{user_name}</strong>,<br><br>
-        You haven't checked in for your <strong>{resource}</strong> booking at <strong>{when}</strong>.
-        If you don't check in within the next 10 minutes, it will be marked as a <strong style="color:#D97706;">no-show</strong>
-        and affect your reliability score.""",
-        cta_label="Check in now",
-        cta_url=link,
-    )
+    subject = f"IMPORTANT: Check-in Pending — {resource}"
+    body = f"""Hi <strong>{user_name}</strong>,<br><br>
+        Your booking for <strong>{resource}</strong> started at <strong>{when}</strong>, but we haven't detected your check-in yet.<br><br>
+        <strong style="color:#DC2626;">URGENT:</strong> If you do not check in within the **next 5 minutes**, your reservation will be <strong style="color:#DC2626;">automatically cancelled</strong> to free up the resource for others."""
+    
+    html = _wrap("Urgent: Check-in Required", body, cta_label="Check-in Now", cta_url=link)
     return subject, html
 
 

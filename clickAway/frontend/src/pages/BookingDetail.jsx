@@ -240,6 +240,35 @@ export default function BookingDetail() {
                 <Clock4 size={14} /> Request extension
               </button>
             )}
+            
+            {booking.state === "checked_in" && isOwner && (
+              <button
+                onClick={async () => {
+                  if (!window.confirm("Are you finished with this resource? This will notify your manager to free it up for others.")) return;
+                  setBusy(true);
+                  try {
+                    await api.post(`/bookings/${id}/request-release`);
+                    toast.success("Release request sent to manager!");
+                    await load();
+                  } catch (e) {
+                    toast.error(formatApiErrorDetail(e.response?.data?.detail) || "Request failed");
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
+                disabled={busy}
+                className="sf-btn-outline !text-xs !py-2.5 border-green-500/30 hover:bg-green-500/10 text-green-700 bg-green-50/50"
+              >
+                Release Resource Early
+              </button>
+            )}
+
+            {booking.state === "release_pending" && isOwner && (
+              <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl px-4 py-2.5 text-[11px] text-blue-600 font-bold flex items-center gap-2 italic">
+                <Loader2 size={12} className="animate-spin opacity-50" />
+                Waiting for manager to acknowledge early release...
+              </div>
+            )}
           </div>
 
           {extOpen && (

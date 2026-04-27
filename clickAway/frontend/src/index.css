@@ -86,6 +86,12 @@
     width: 100%;
     max-width: 100vw;
   }
+  .dark {
+    color-scheme: dark;
+  }
+  .light {
+    color-scheme: light;
+  }
   * {
     @apply border-border;
     transition: background-color 0.3s ease, border-color 0.3s ease, color 0.2s ease;
@@ -96,6 +102,11 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     min-height: 100vh;
+  }
+  input[type="datetime-local"], 
+  input[type="date"], 
+  input[type="time"] {
+    @apply appearance-none;
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Outfit', sans-serif;

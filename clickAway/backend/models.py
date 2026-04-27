@@ -40,6 +40,7 @@ class BookingState(str, enum.Enum):
     no_show_warning = "no_show_warning"
     no_show = "no_show"
     extension_pending = "extension_pending"
+    release_pending = "release_pending"
     cancelled = "cancelled"
     completed = "completed"
 
@@ -52,6 +53,7 @@ class NotificationType(str, enum.Enum):
     maintenance_impact = "maintenance_impact"
     extension_update = "extension_update"
     approval_required = "approval_required"
+    release_requested = "release_requested"
 
 
 class FeedbackStatus(str, enum.Enum):

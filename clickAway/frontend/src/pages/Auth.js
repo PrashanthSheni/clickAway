@@ -169,7 +169,7 @@ export default function Auth() {
                         required
                         value={formData.email}
                         onChange={e => setFormData({ ...formData, email: e.target.value })}
-                        className="w-full rounded-xl px-12 py-4 text-sm font-medium focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-sm bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 dark:bg-white/5 dark:border-white/10 dark:text-white dark:placeholder:text-white/40"
+                        className="sf-input pl-12"
                         placeholder="demo1@example.com"
                       />
                     </div>
@@ -185,7 +185,7 @@ export default function Auth() {
                         required
                         value={formData.password}
                         onChange={e => setFormData({ ...formData, password: e.target.value })}
-                        className="w-full rounded-xl px-12 py-4 text-sm font-medium focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-sm bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 dark:bg-white/5 dark:border-white/10 dark:text-white dark:placeholder:text-white/40"
+                        className="sf-input pl-12"
                         placeholder="••••••••"
                       />
                     </div>
@@ -208,7 +208,7 @@ export default function Auth() {
                           required
                           value={formData.name}
                           onChange={e => setFormData({ ...formData, name: e.target.value })}
-                          className="w-full rounded-xl px-12 py-4 text-sm font-medium focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-sm bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 dark:bg-white/5 dark:border-white/10 dark:text-white dark:placeholder:text-white/40"
+                          className="sf-input pl-12"
                           placeholder="John Doe"
                         />
                       </div>
@@ -218,10 +218,10 @@ export default function Auth() {
                       <select
                         value={formData.role}
                         onChange={e => setFormData({ ...formData, role: e.target.value })}
-                        className="w-full rounded-xl px-4 py-4 text-sm font-medium focus:ring-2 focus:ring-primary/20 outline-none transition-all appearance-none cursor-pointer shadow-sm bg-white border border-slate-200 text-slate-900 dark:bg-white/5 dark:border-white/10 dark:text-white"
+                        className="sf-input appearance-none cursor-pointer"
                       >
-                        <option value="employee" className="text-black">Employee</option>
-                        <option value="manager" className="text-black">Manager</option>
+                        <option value="employee" className="bg-background text-foreground">Employee</option>
+                        <option value="manager" className="bg-background text-foreground">Manager</option>
                       </select>
                     </div>
                     <div className="space-y-2">
@@ -233,7 +233,7 @@ export default function Auth() {
                           required
                           value={formData.email}
                           onChange={e => setFormData({ ...formData, email: e.target.value })}
-                          className="w-full rounded-xl px-12 py-4 text-sm font-medium focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-sm bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 dark:bg-white/5 dark:border-white/10 dark:text-white dark:placeholder:text-white/40"
+                          className="sf-input pl-12"
                           placeholder="name@organization.com"
                         />
                       </div>
@@ -247,7 +247,7 @@ export default function Auth() {
                           required
                           value={formData.password}
                           onChange={e => setFormData({ ...formData, password: e.target.value })}
-                          className="w-full rounded-xl px-12 py-4 text-sm font-medium focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-sm bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 dark:bg-white/5 dark:border-white/10 dark:text-white dark:placeholder:text-white/40"
+                          className="sf-input pl-12"
                           placeholder="Min. 12 characters"
                         />
                       </div>
@@ -263,7 +263,7 @@ export default function Auth() {
                             required
                             value={formData.pending_manager_email}
                             onChange={e => setFormData({ ...formData, pending_manager_email: e.target.value })}
-                            className="w-full rounded-xl px-12 py-4 text-sm font-medium focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-sm bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 dark:bg-white/5 dark:border-white/10 dark:text-white dark:placeholder:text-white/40"
+                            className="sf-input pl-12"
                             placeholder="manager@organization.com"
                           />
                         </div>
@@ -289,7 +289,7 @@ export default function Auth() {
                         required
                         value={formData.verification_code}
                         onChange={e => setFormData({ ...formData, verification_code: e.target.value })}
-                        className="w-full rounded-xl px-6 py-6 text-center text-3xl tracking-[0.4em] font-medium outline-none shadow-sm transition-colors duration-500 bg-white border border-slate-200 text-slate-900 dark:bg-white/5 dark:border-white/10 dark:text-white"
+                        className="sf-input text-center text-3xl tracking-[0.4em] font-black h-20"
                         maxLength={6}
                       />
                     </div>

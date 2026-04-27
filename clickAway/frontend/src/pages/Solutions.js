@@ -42,7 +42,7 @@ const Solutions = () => {
    ];
 
    return (
-      <div className={`min-h-screen font-sans ${theme === 'dark' ? 'bg-[#050505] text-white' : 'bg-background text-foreground'}`}>
+      <div className="min-h-screen bg-background text-foreground">
          {/* ── Nav ── */}
          <nav className={`
             fixed top-0 left-0 w-full z-[100] transition-all duration-500
@@ -245,45 +245,32 @@ const Solutions = () => {
                      tag: "Enterprise Security"
                   }
                ].map((solver, i) => (
-                  <div key={i} className={`
-                     group relative p-8 rounded-[32px] border transition-all duration-500 overflow-hidden
-                     ${theme === 'dark' 
-                        ? 'bg-white/5 border-white/10 hover:bg-white/10' 
-                        : 'bg-accent/50 border-border hover:bg-accent/80'}
-                  `}>
-                     <div className="absolute top-0 right-0 p-6">
-                        <span className={`text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border
-                           ${theme === 'dark' 
-                              ? 'text-primary bg-primary/10 border-primary/20' 
-                              : 'text-primary bg-primary/5 border-primary/20'}
-                        `}>
+                  <div key={i} className="sf-card group relative p-10 overflow-hidden bg-sf-bg-soft/40">
+                     <div className="absolute top-0 right-0 p-8">
+                        <span className="sf-badge !bg-primary/10 !text-primary !border-primary/20">
                            {solver.tag}
                         </span>
                      </div>
                      
                      <div className="space-y-8">
-                        <div className="space-y-3">
-                           <div className={`text-[10px] font-bold uppercase tracking-widest ${theme === 'dark' ? 'text-white/30' : 'text-muted-foreground/60'}`}>The Challenge</div>
-                           <h3 className={`text-2xl font-bold tracking-tight transition-colors
-                              ${theme === 'dark' ? 'text-white/60 group-hover:text-white' : 'text-foreground/70 group-hover:text-foreground'}
-                           `}>
-                              {solver.problem}
-                           </h3>
-                        </div>
+                         <div className="space-y-3">
+                            <div className="sf-label !mb-0">The Challenge</div>
+                            <h3 className="text-3xl font-black tracking-tight text-foreground/80 group-hover:text-foreground transition-colors leading-none">
+                               {solver.problem}
+                            </h3>
+                         </div>
 
-                        <div className={`h-[1px] w-full bg-gradient-to-r ${theme === 'dark' ? 'from-primary/40 to-transparent' : 'from-primary/20 to-transparent'}`} />
+                         <div className="h-[1px] w-full bg-border/40" />
 
-                        <div className="space-y-4">
-                           <div className="flex items-center gap-2.5">
-                              <div className="h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_8px_#3b82f6]" />
-                              <div className="text-[11px] font-black uppercase tracking-widest text-primary">The Solution: {solver.solution}</div>
-                           </div>
-                           <p className={`text-base leading-relaxed font-medium transition-colors
-                              ${theme === 'dark' ? 'text-white/40 group-hover:text-white/70' : 'text-muted-foreground group-hover:text-foreground/80'}
-                           `}>
-                              {solver.desc}
-                           </p>
-                        </div>
+                         <div className="space-y-4">
+                            <div className="flex items-center gap-3">
+                               <div className="h-2 w-2 rounded-full bg-primary animate-pulse shadow-[0_0_8px_#3b82f6]" />
+                               <div className="text-[11px] font-black uppercase tracking-widest text-primary">Intelligence Vector: {solver.solution}</div>
+                            </div>
+                            <p className="text-sm leading-relaxed font-medium text-muted-foreground group-hover:text-foreground/70 transition-colors">
+                               {solver.desc}
+                            </p>
+                         </div>
                      </div>
                   </div>
                ))}
